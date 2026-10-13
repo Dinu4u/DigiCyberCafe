@@ -68,6 +68,8 @@ export function PassportPhotoCreator() {
   const [notice, setNotice] = useState("");
   const dragRef = useRef<{ startX: number; startY: number; crop: CropRect; mode: "move" | "resize" } | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  const stageContainerRef = useRef<HTMLDivElement | null>(null);
+  const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => () => {
     workerAbortRef.current?.abort();
@@ -77,8 +79,22 @@ export function PassportPhotoCreator() {
   const previewFilter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
 
   useEffect(() => {
+    const container = stageContainerRef.current;
+    if (!container || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      setStageSize({ width: entry.contentRect.width, height: entry.contentRect.height });
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [sourceUrl]);
+
+  useEffect(() => {
     if (bitmap) setCropRect(getDefaultCrop(bitmap.width / bitmap.height, selectedPreset.width / selectedPreset.height));
   }, [bitmap, presetKey, selectedPreset.height, selectedPreset.width, setCropRect]);
+
+  const imageAspect = bitmap ? bitmap.width / bitmap.height : 1;
+  const frameWidth = stageSize.width && stageSize.height ? Math.min(stageSize.width, stageSize.height * imageAspect) : undefined;
+  const frameHeight = frameWidth ? frameWidth / imageAspect : undefined;
 
   const handleFileInput = async (file?: File) => {
     if (!file) return;
@@ -337,13 +353,15 @@ export function PassportPhotoCreator() {
           </div>
         </div>
 
-        <label className={`relative flex min-h-[220px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 text-center transition hover:border-emerald-500 dark:border-slate-700 dark:bg-slate-950 ${sourceUrl ? "h-[min(60vh,560px)]" : ""}`}>
+        <label className={`relative flex min-h-[220px] items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center transition hover:border-emerald-500 dark:border-slate-700 dark:bg-slate-950 ${sourceUrl ? "h-[min(60vh,560px)]" : "p-4"}`}>
           {sourceUrl && bitmap ? <div className="relative h-full w-full overflow-hidden rounded-xl" onPointerMove={handleCropPointerMove} onPointerUp={handleCropPointerUp} onPointerLeave={handleCropPointerUp}>
-            <div ref={stageRef} className="absolute inset-0 m-auto" style={{ height: "100%", width: "auto", maxWidth: "100%", aspectRatio: `${bitmap.width}/${bitmap.height}`, touchAction: "none" }}>
+            <div ref={stageContainerRef} className="absolute inset-0">
+              <div ref={stageRef} className="absolute" style={{ width: frameWidth ?? "100%", height: frameHeight ?? "100%", top: "50%", left: "50%", transform: "translate(-50%, -50%)", touchAction: "none" }}>
               <Image unoptimized src={sourceUrl} alt="Passport photo source" fill className="object-contain" style={{ filter: previewFilter, transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flipHorizontal ? -1 : 1})`, transition: "transform 0.12s ease-out, filter 0.12s ease-out" }} />
               <div onPointerDown={handleCropPointerDown} className="absolute cursor-move border-2 border-emerald-400 bg-emerald-500/10 shadow-[0_0_0_9999px_rgba(15,23,42,0.36)]" style={{ left: `${cropRect.x * 100}%`, top: `${cropRect.y * 100}%`, width: `${cropRect.width * 100}%`, height: `${cropRect.height * 100}%`, touchAction: "none" }}>
                 <div className="pointer-events-none absolute inset-0 grid place-items-center text-[10px] font-semibold uppercase tracking-[0.20em] text-emerald-400">Crop</div>
                 <button type="button" aria-label="Resize crop area" onPointerDown={handleCropResizePointerDown} className="absolute -bottom-2 -right-2 size-5 rounded-full border-2 border-white bg-emerald-500 shadow" />
+              </div>
               </div>
             </div>
           </div> : <span className="grid justify-items-center gap-2"><ImagePlus size={28} className="text-emerald-600" /><strong className="text-base font-medium">Upload your passport or ID photo</strong><small className="max-w-xs text-sm text-slate-500">JPG, PNG, or WebP. Best with clear face, direct light, and plain background.</small></span>}
