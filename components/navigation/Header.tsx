@@ -7,13 +7,13 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link
-          aria-label="eCyberCafe Home"
+          aria-label="DigiCyberCafe Home"
           className={styles.brand}
           href="/"
-          title="Go to eCyberCafe Home"
+          title="Go to DigiCyberCafe Home"
         >
-          <span aria-hidden="true" className={styles.brandMark}>e</span>
-          <span className={styles.brandName}>eCyberCafe</span>
+          <span aria-hidden="true" className={styles.brandMark}>D</span>
+          <span className={styles.brandName}>DigiCyberCafe</span>
           <span className={styles.brandBadge}>Privacy-first tools</span>
         </Link>
 

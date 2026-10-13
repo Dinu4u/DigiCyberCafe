@@ -14,13 +14,13 @@ const siteUrl = "https://ecybercafe.in";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "eCyberCafe | In-Browser Document, PDF & Photo Tools",
-    template: "%s | eCyberCafe - Aapka Digital Cyber Café & Document Hub",
+    default: "DigiCyberCafe | In-Browser Document, PDF & Photo Tools",
+    template: "%s | DigiCyberCafe - Aapka Digital Cyber Café & Document Hub",
   },
   description:
     "Free digital cyber café for exam forms, office files, and daily documents. Resize photos for upload limits, add exam photo details, edit and sign PDFs, and use browser-based tools with local processing where supported.",
   keywords: [
-    "eCyberCafe",
+    "DigiCyberCafe",
     "online cyber cafe",
     "sarkari photo resizer 50kb",
     "ssc photo name date maker",
@@ -39,9 +39,9 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "eCyberCafe",
+    siteName: "DigiCyberCafe",
     url: siteUrl,
-    title: "eCyberCafe | In-Browser Document, PDF & Photo Tools",
+    title: "DigiCyberCafe | In-Browser Document, PDF & Photo Tools",
     description:
       "Free document, PDF, photo, and exam tools with local processing where supported.",
     locale: "en_IN",
@@ -51,18 +51,18 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "eCyberCafe passport photo resizer, target file-size tools, and PDF utilities",
+        alt: "DigiCyberCafe passport photo resizer, target file-size tools, and PDF utilities",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "eCyberCafe | In-Browser Document, PDF & Photo Tools",
+    title: "DigiCyberCafe | In-Browser Document, PDF & Photo Tools",
     description:
       "Free document, PDF, photo, and exam tools with local processing where supported.",
     images: ["/opengraph-image"],
   },
-  applicationName: "eCyberCafe",
+  applicationName: "DigiCyberCafe",
   creator: "Dinesh Kumar",
   publisher: "Dinesh Kumar",
   other: {

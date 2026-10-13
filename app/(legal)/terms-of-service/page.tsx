@@ -4,7 +4,7 @@ import { AD_CONFIG } from "@/config/adPolicy";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms, permitted use, and limitations for eCyberCafe utilities.",
+  description: "Terms, permitted use, and limitations for DigiCyberCafe utilities.",
   alternates: { canonical: "/terms-of-service" },
 };
 
@@ -19,7 +19,7 @@ export default function TermsOfServicePage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-900">1. Agreement and operator</h2>
           <p className="mt-2">
-            These terms apply when you use eCyberCafe, operated by {AD_CONFIG.PUBLISHER_INFO.NAME}
+            These terms apply when you use DigiCyberCafe, operated by {AD_CONFIG.PUBLISHER_INFO.NAME}
             {" "}in {AD_CONFIG.PUBLISHER_INFO.LOCATION}. If you do not agree, do not use
             the service. Contact{" "}
             <a className="underline" href={`mailto:${AD_CONFIG.PUBLISHER_INFO.EMAIL}`}>{AD_CONFIG.PUBLISHER_INFO.EMAIL}</a>
@@ -48,7 +48,7 @@ export default function TermsOfServicePage() {
             the destination service. No photo, application, exam eligibility,
             financial estimate, tax document, or converted file is guaranteed to
             be accepted or accurate for a particular purpose. Check official
-            instructions and review every result before relying on it. eCyberCafe
+            instructions and review every result before relying on it. DigiCyberCafe
             is not affiliated with government agencies, exam authorities, or
             financial institutions.
           </p>
@@ -68,7 +68,7 @@ export default function TermsOfServicePage() {
             To the extent permitted by applicable law, the service is provided
             without warranties, express or implied, including warranties of
             availability, fitness for a particular purpose, or error-free
-            operation. To the extent permitted by law, eCyberCafe and its operator
+            operation. To the extent permitted by law, DigiCyberCafe and its operator
             are not liable for indirect, incidental, special, consequential, or
             punitive loss, or for loss of data, business, opportunity, or
             submissions resulting from use of the service. Nothing in these terms

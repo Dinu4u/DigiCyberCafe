@@ -4,7 +4,7 @@ import { AD_CONFIG } from "@/config/adPolicy";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How eCyberCafe handles browser-processed files, accounts, saved documents, media URLs, cookies, and advertising.",
+  description: "How DigiCyberCafe handles browser-processed files, accounts, saved documents, media URLs, cookies, and advertising.",
   alternates: { canonical: "/privacy-policy" },
 };
 
@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-900">1. Operator and contact</h2>
           <p className="mt-2">
-            eCyberCafe is operated by {AD_CONFIG.PUBLISHER_INFO.NAME} in{" "}
+            DigiCyberCafe is operated by {AD_CONFIG.PUBLISHER_INFO.NAME} in{" "}
             {AD_CONFIG.PUBLISHER_INFO.LOCATION}. Privacy questions and requests:
             {" "}<a className="underline" href={`mailto:${AD_CONFIG.PUBLISHER_INFO.EMAIL}`}>{AD_CONFIG.PUBLISHER_INFO.EMAIL}</a>.
           </p>
@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
           <p className="mt-2">
             The exam age calculator also supports a Hindu lunar birth-date input. Its birth
             date, optional birth time, and calendar selections are processed in your browser.
-            If you use the city search, the city name you enter is sent to eCyberCafe and
+            If you use the city search, the city name you enter is sent to DigiCyberCafe and
             forwarded to Open-Meteo&apos;s geocoding service to retrieve city coordinates and
             time zone. The birth date and time are not included in that lookup. The returned
             location is used locally for sunrise and calendar calculations.

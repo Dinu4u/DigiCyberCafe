@@ -15,7 +15,7 @@ export function RecoveryCard({ onRetry }: RecoveryCardProps) {
         <h1>We couldn&apos;t load this tool or page.</h1>
         <p className={styles.message}>
           The page may have moved, or something went wrong while it was
-          opening. Return to eCyberCafe Home to continue.
+          opening. Return to DigiCyberCafe Home to continue.
         </p>
         <div className={styles.actions}>
           {onRetry && (
@@ -24,7 +24,7 @@ export function RecoveryCard({ onRetry }: RecoveryCardProps) {
             </button>
           )}
           <Link className={styles.primary} href="/">
-            <ArrowLeft size={16} /> Return to eCyberCafe Home
+            <ArrowLeft size={16} /> Return to DigiCyberCafe Home
           </Link>
         </div>
       </section>

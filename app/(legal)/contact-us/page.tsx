@@ -18,7 +18,7 @@ export default function ContactUsPage() {
     const body = [`Name: ${name}`, `Reply-to: ${replyTo}`, "", details].join("\n");
 
     window.location.href = `mailto:${AD_CONFIG.PUBLISHER_INFO.EMAIL}?${new URLSearchParams({
-      subject: subject || "eCyberCafe enquiry",
+      subject: subject || "DigiCyberCafe enquiry",
       body,
     }).toString()}`;
     setMessage("Your email app should open with your message ready to send.");
@@ -31,7 +31,7 @@ export default function ContactUsPage() {
       <h1 className="mt-2 text-4xl font-semibold tracking-tight text-slate-900">Get in touch</h1>
       <p className="mt-4 leading-7 text-slate-600">
         Questions, accessibility feedback, corrections, or tool issues are welcome.
-        Contact Dinesh Kumar, the operator of eCyberCafe, in Patna, Bihar, India.
+        Contact Dinesh Kumar, the operator of DigiCyberCafe, in Patna, Bihar, India.
       </p>
       <p className="mt-3 leading-7 text-slate-600">
         Email{" "}
@@ -66,7 +66,7 @@ export default function ContactUsPage() {
         <p aria-live="polite" className="text-sm text-slate-600">{message}</p>
       </form>
       <address className="mt-7 text-sm not-italic leading-6 text-slate-500">
-        Dinesh Kumar · eCyberCafe
+        Dinesh Kumar · DigiCyberCafe
         <br />
         Patna, Bihar — 800024, India
       </address>

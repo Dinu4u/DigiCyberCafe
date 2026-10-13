@@ -10,10 +10,10 @@ interface BrandHomeLinkProps {
 export function BrandHomeLink({ children, className }: BrandHomeLinkProps) {
   return (
     <Link
-      aria-label="eCyberCafe Home"
+      aria-label="DigiCyberCafe Home"
       className={`${className} ${styles.link}`}
       href="/"
-      title="Go to eCyberCafe Home"
+      title="Go to DigiCyberCafe Home"
     >
       {children}
     </Link>

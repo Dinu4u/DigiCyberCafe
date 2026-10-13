@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "eCyberCafe | Digital Cyber Café & Document Hub",
-    short_name: "eCyberCafe",
+    name: "DigiCyberCafe | Digital Cyber Café & Document Hub",
+    short_name: "DigiCyberCafe",
     description:
       "Private browser-based document, PDF, photo, and exam tools for everyday work.",
     start_url: "/",

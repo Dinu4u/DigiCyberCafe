@@ -29,7 +29,7 @@ const faqs: ToolFaq[] = [
   { question: "Does category relaxation guarantee eligibility?", answer: "No. The calculator applies simplified indicative relaxations. Official exam notices may include post, service, domicile, and other conditions." },
   { question: "How does Hindu lunar date conversion work?", answer: "Choose the Vikram Samvat year, Purnimanta masa, paksha, and tithi. The calculator uses the selected birth city for its time zone and local sunrise, then resolves matching Gregorian dates in your browser. An optional birth time checks the tithi at that time; without it, tithi is checked at local sunrise." },
   { question: "What does the Adhika month option mean?", answer: "Select it only when your recorded Panchang date names an Adhika (intercalary) masa. The calculated result is an astronomical estimate; regional Panchang conventions can differ, so verify dates against family records or a trusted local Panchang." },
-  { question: "Is my date of birth uploaded?", answer: "No. DOB, time, and selected lunar date stay in the browser. Only the city-name lookup is sent through eCyberCafe to Open-Meteo's geocoding service; coordinates returned for the selected city are used locally." },
+  { question: "Is my date of birth uploaded?", answer: "No. DOB, time, and selected lunar date stay in the browser. Only the city-name lookup is sent through DigiCyberCafe to Open-Meteo's geocoding service; coordinates returned for the selected city are used locally." },
 ];
 
 export default function SarkariExamAgeCalculatorPage() {

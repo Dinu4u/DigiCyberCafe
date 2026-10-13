@@ -26,7 +26,7 @@ export function Footer() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-center text-slate-700 sm:text-left">
             <Link className="font-medium text-slate-900 hover:underline" href="/">
-              eCyberCafe
+              DigiCyberCafe
             </Link>
             <span className="mx-2 text-slate-400" aria-hidden="true">·</span>
             made for the details
@@ -51,7 +51,7 @@ export function Footer() {
 
         <div className="grid gap-5 pt-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
           <div className="text-center sm:text-left">
-            <p className="font-medium text-slate-800">eCyberCafe</p>
+            <p className="font-medium text-slate-800">DigiCyberCafe</p>
             <address className="mt-1 not-italic leading-6 text-slate-500">
               {AD_CONFIG.PUBLISHER_INFO.LOCATION}
               <br />
@@ -78,7 +78,7 @@ export function Footer() {
             </nav>
             <AnalyticsSettingsButton />
             <p className="text-xs text-slate-400">
-              © {new Date().getFullYear()} eCyberCafe
+              © {new Date().getFullYear()} DigiCyberCafe
             </p>
           </div>
         </div>

@@ -6,8 +6,8 @@ const structuredData = {
     {
       "@type": "Organization",
       "@id": `${siteUrl}/#organization`,
-      name: "eCyberCafe",
-      alternateName: ["e-CyberCafe", "Digital Cyber Cafe", "CyberCafe Online"],
+      name: "DigiCyberCafe",
+      alternateName: ["Digital Cyber Cafe", "CyberCafe Online"],
       url: siteUrl,
       logo: {
         "@type": "ImageObject",
@@ -24,8 +24,8 @@ const structuredData = {
       "@type": "WebSite",
       "@id": `${siteUrl}/#website`,
       url: siteUrl,
-      name: "eCyberCafe",
-      alternateName: ["e-CyberCafe", "Digital Cyber Cafe", "CyberCafe Online"],
+      name: "DigiCyberCafe",
+      alternateName: ["Digital Cyber Cafe", "CyberCafe Online"],
       inLanguage: ["en-IN", "en-US", "hi-IN"],
       publisher: { "@id": `${siteUrl}/#organization` },
       potentialAction: {
@@ -40,7 +40,7 @@ const structuredData = {
     {
       "@type": ["WebApplication", "SoftwareApplication"],
       "@id": `${siteUrl}/#application`,
-      name: "eCyberCafe",
+      name: "DigiCyberCafe",
       url: siteUrl,
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "Web Browser (Windows, Mac, Android, iOS)",

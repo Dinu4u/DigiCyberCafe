@@ -4,8 +4,8 @@ import { BackToHome } from "@/components/navigation/BackToHome";
 import { AD_CONFIG } from "@/config/adPolicy";
 
 export const metadata: Metadata = {
-  title: "About eCyberCafe",
-  description: "Learn about eCyberCafe, its operator, purpose, browser-based utilities, and privacy approach.",
+  title: "About DigiCyberCafe",
+  description: "Learn about DigiCyberCafe, its operator, purpose, browser-based utilities, and privacy approach.",
   alternates: { canonical: "/about-us" },
 };
 
@@ -13,11 +13,11 @@ export default function AboutUsPage() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
       <BackToHome />
-      <p className="text-sm font-medium uppercase tracking-wide text-emerald-800">About eCyberCafe</p>
+      <p className="text-sm font-medium uppercase tracking-wide text-emerald-800">About DigiCyberCafe</p>
       <h1 className="mt-2 text-4xl font-semibold tracking-tight text-slate-900">Practical digital tools, with clear limits</h1>
       <div className="mt-6 space-y-5 leading-7 text-slate-600">
         <p>
-          eCyberCafe is an independent collection of document, photo, PDF, and
+          DigiCyberCafe is an independent collection of document, photo, PDF, and
           everyday exam-related utilities operated by {AD_CONFIG.PUBLISHER_INFO.NAME}
           {" "}in Patna, Bihar, India. The aim is to make common digital tasks easier
           to understand and complete in a browser, including preparing documents

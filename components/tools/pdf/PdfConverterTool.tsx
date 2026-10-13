@@ -57,7 +57,7 @@ export function PdfConverterTool({ mode }: { mode: ConverterMode }) {
           ? await convertOfficeToPdf(files[0])
           : await convertTextToPdf(text, fontSize);
       setPreviewData(bytes);
-      runMonetizedAction(() => downloadPdf(bytes, `${files[0]?.name.replace(/\.[^.]+$/, "") ?? mode}-eCyberCafe.pdf`));
+      runMonetizedAction(() => downloadPdf(bytes, `${files[0]?.name.replace(/\.[^.]+$/, "") ?? mode}-DigiCyberCafe.pdf`));
       setMessage("PDF created and downloaded. The first page preview is ready.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not create the PDF.");

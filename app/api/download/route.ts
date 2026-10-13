@@ -28,5 +28,5 @@ export async function POST(request: Request) {
   let errorOutput = "";
   child.stderr.on("data", (chunk) => { errorOutput += chunk.toString(); });
   const stream = new ReadableStream({ start(controller) { child.stdout.on("data", (chunk) => controller.enqueue(chunk)); child.stdout.on("end", () => { if (child.exitCode && child.exitCode !== 0) controller.error(new Error(errorOutput || "yt-dlp failed")); else controller.close(); }); child.on("error", () => controller.error(new Error("yt-dlp is not installed or is unavailable on the server."))); }, cancel() { child.kill(); } });
-  return new Response(stream, { headers: { "Content-Type": format === "mp3" ? "audio/mpeg" : "video/mp4", "Content-Disposition": `attachment; filename="eCyberCafe-download.${format === "mp3" ? "mp3" : "mp4"}"`, "Transfer-Encoding": "chunked", "Cache-Control": "no-store" } });
+  return new Response(stream, { headers: { "Content-Type": format === "mp3" ? "audio/mpeg" : "video/mp4", "Content-Disposition": `attachment; filename="DigiCyberCafe-download.${format === "mp3" ? "mp3" : "mp4"}"`, "Transfer-Encoding": "chunked", "Cache-Control": "no-store" } });
 }

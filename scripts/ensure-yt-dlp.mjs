@@ -27,7 +27,7 @@ try {
 
 const headers = {
   Accept: "application/vnd.github+json",
-  "User-Agent": "ecybercafe-build",
+  "User-Agent": "digicybercafe-build",
 };
 
 async function fetchOk(url, accept = headers.Accept) {
