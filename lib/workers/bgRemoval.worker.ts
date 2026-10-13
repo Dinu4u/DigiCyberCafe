@@ -1,9 +1,9 @@
-import { pipeline, type BackgroundRemovalPipeline, type ProgressInfo, type RawImage } from "@huggingface/transformers";
+import { AutoModel, AutoProcessor, RawImage, type ProgressInfo } from "@huggingface/transformers";
 
 type WorkerRequest = { type: "remove-background"; imageBytes: ArrayBuffer; mimeType: string };
 type WorkerProgress = { type: "progress"; status: "downloading-model" | "processing"; progress: number; message: string };
 type WorkerResult =
-  | { type: "success"; previewPng: Blob; maskData: ArrayBuffer; maskWidth: number; maskHeight: number; sourceWidth: number; sourceHeight: number; inferenceScale: number }
+  | { type: "success"; maskData: ArrayBuffer; maskWidth: number; maskHeight: number; sourceWidth: number; sourceHeight: number; inferenceScale: number }
   | { type: "failure"; kind: "memory" | "acceleration" | "no-subject" | "corrupt" | "unknown"; message: string };
 
 const workerScope = self as unknown as {
@@ -11,9 +11,13 @@ const workerScope = self as unknown as {
   postMessage: (message: WorkerProgress | WorkerResult, transfer?: Transferable[]) => void;
 };
 
-const MODEL_ID = "Xenova/modnet";
+const MODEL_ID = "onnx-community/BiRefNet_lite-ONNX";
+const MODEL_REVISION = "de15b22ba131738a16dff04aab8bdf8dc32e3ac1";
 const MAX_INFERENCE_EDGE = 2500;
 let busy = false;
+
+type BiRefNetModel = Awaited<ReturnType<typeof AutoModel.from_pretrained>>;
+type BiRefNetProcessor = Awaited<ReturnType<typeof AutoProcessor.from_pretrained>>;
 
 workerScope.onmessage = async ({ data }) => {
   if (busy) {
@@ -23,8 +27,7 @@ workerScope.onmessage = async ({ data }) => {
   busy = true;
   let bitmap: ImageBitmap | null = null;
   let inputCanvas: OffscreenCanvas | null = null;
-  let outputCanvas: OffscreenCanvas | null = null;
-  let segmenter: BackgroundRemovalPipeline | null = null;
+  let model: BiRefNetModel | null = null;
 
   const progress = (status: WorkerProgress["status"], value: number, message: string) => {
     workerScope.postMessage({ type: "progress", status, progress: Math.max(0, Math.min(100, Math.round(value))), message });
@@ -57,52 +60,41 @@ workerScope.onmessage = async ({ data }) => {
     bitmap.close();
     bitmap = null;
 
-    progress("downloading-model", 0, "Preparing the local segmentation model…");
+    progress("downloading-model", 0, "Preparing the higher-quality BiRefNet Lite model…");
     const canTryWebGpu = Boolean((self.navigator as unknown as { gpu?: unknown }).gpu);
     let device: "webgpu" | "wasm" = canTryWebGpu ? "webgpu" : "wasm";
+    let processor: BiRefNetProcessor;
     try {
-      segmenter = await loadSegmenter(device, progress);
+      ({ model, processor } = await loadBiRefNet(device, progress));
     } catch (error) {
       if (device !== "webgpu") throw error;
       device = "wasm";
       progress("downloading-model", 0, "GPU initialization failed. Preparing the browser WASM engine…");
-      segmenter = await loadSegmenter(device, progress);
+      ({ model, processor } = await loadBiRefNet(device, progress));
     }
     progress("processing", 5, `Separating foreground with ${device === "webgpu" ? "GPU" : "WASM"} acceleration…`);
 
-    let segmented: RawImage;
+    let maskData: Uint8Array;
     try {
-      segmented = await segmenter(inputCanvas);
+      maskData = await inferMask(model, processor, inputCanvas, inferenceWidth, inferenceHeight);
     } catch (error) {
       if (device !== "webgpu") throw error;
-      await safelyDispose(segmenter);
-      segmenter = null;
+      await safelyDispose(model);
+      model = null;
       device = "wasm";
       progress("processing", 8, "GPU acceleration was unavailable. Retrying with browser WASM…");
-      segmenter = await loadSegmenter(device, progress);
-      segmented = await segmenter(inputCanvas);
+      ({ model, processor } = await loadBiRefNet(device, progress));
+      maskData = await inferMask(model, processor, inputCanvas, inferenceWidth, inferenceHeight);
     }
 
-    progress("processing", 78, "Building the foreground mask…");
-    const rgba = segmented.channels === 4 ? segmented : segmented.rgba();
-    const maskData = extractAlphaMask(rgba);
     validateMask(maskData);
-
-    outputCanvas = new OffscreenCanvas(rgba.width, rgba.height);
-    const outputContext = outputCanvas.getContext("2d", { alpha: true });
-    if (!outputContext) throw new BackgroundWorkerError("memory", "The browser could not allocate an output canvas for the foreground.");
-    const rgbaData = new Uint8ClampedArray(rgba.data.buffer, rgba.data.byteOffset, rgba.data.byteLength);
-    outputContext.putImageData(new ImageData(rgbaData.slice(), rgba.width, rgba.height), 0, 0);
-    const previewBlob = await outputCanvas.convertToBlob({ type: "image/png" });
-    rgba.data.fill(0);
     const transferredMask = maskData.buffer as ArrayBuffer;
     progress("processing", 100, "Foreground mask ready.");
     workerScope.postMessage({
       type: "success",
-      previewPng: previewBlob,
       maskData: transferredMask,
-      maskWidth: rgba.width,
-      maskHeight: rgba.height,
+      maskWidth: inferenceWidth,
+      maskHeight: inferenceHeight,
       sourceWidth,
       sourceHeight,
       inferenceScale,
@@ -116,31 +108,52 @@ workerScope.onmessage = async ({ data }) => {
       inputCanvas.width = 0;
       inputCanvas.height = 0;
     }
-    if (outputCanvas) {
-      outputCanvas.width = 0;
-      outputCanvas.height = 0;
-    }
-    await safelyDispose(segmenter);
+    await safelyDispose(model);
     busy = false;
   }
 };
 
-async function loadSegmenter(device: "webgpu" | "wasm", progress: (status: WorkerProgress["status"], value: number, message: string) => void) {
-  return pipeline("background-removal", MODEL_ID, {
-    device,
-    dtype: "fp32",
-    progress_callback: (info: ProgressInfo) => {
-      if (info.status === "progress_total") progress("downloading-model", info.progress, "Downloading model files to this browser…");
-      else if (info.status === "ready") progress("downloading-model", 100, "Model ready.");
-    },
-  }) as Promise<BackgroundRemovalPipeline>;
+async function loadBiRefNet(
+  device: "webgpu" | "wasm",
+  progress: (status: WorkerProgress["status"], value: number, message: string) => void,
+) {
+  const progressCallback = (info: ProgressInfo) => {
+    if (info.status === "progress_total") {
+      progress("downloading-model", info.progress, "Downloading BiRefNet Lite model files to this browser…");
+    } else if (info.status === "ready") {
+      progress("downloading-model", 100, "BiRefNet Lite model ready.");
+    }
+  };
+  const [model, processor] = await Promise.all([
+    AutoModel.from_pretrained(MODEL_ID, {
+      revision: MODEL_REVISION,
+      device,
+      dtype: device === "webgpu" ? "fp16" : "fp32",
+      progress_callback: progressCallback,
+    }),
+    AutoProcessor.from_pretrained(MODEL_ID, {
+      revision: MODEL_REVISION,
+      progress_callback: progressCallback,
+    }),
+  ]);
+  return { model, processor };
 }
 
-function extractAlphaMask(image: RawImage) {
-  if (image.channels !== 4) throw new BackgroundWorkerError("unknown", "The segmentation model returned an unsupported mask format.");
-  const mask = new Uint8Array(image.width * image.height);
-  for (let pixel = 0; pixel < mask.length; pixel += 1) mask[pixel] = image.data[pixel * 4 + 3];
-  return mask;
+async function inferMask(
+  model: BiRefNetModel,
+  processor: BiRefNetProcessor,
+  canvas: OffscreenCanvas,
+  width: number,
+  height: number,
+) {
+  const { pixel_values } = await processor(RawImage.fromCanvas(canvas));
+  const { output_image } = await model({ input_image: pixel_values });
+  const predictedMask = output_image[0].sigmoid().mul(255).to("uint8");
+  const resizedMask = await RawImage.fromTensor(predictedMask).resize(width, height);
+  if (resizedMask.channels !== 1 || resizedMask.data.length !== width * height) {
+    throw new BackgroundWorkerError("unknown", "BiRefNet returned an unsupported mask shape.");
+  }
+  return Uint8Array.from(resizedMask.data);
 }
 
 function validateMask(mask: Uint8Array) {
@@ -158,12 +171,12 @@ function validateMask(mask: Uint8Array) {
   }
 }
 
-async function safelyDispose(segmenter: BackgroundRemovalPipeline | null) {
-  if (!segmenter) return;
+async function safelyDispose(model: BiRefNetModel | null) {
+  if (!model) return;
   try {
-    await segmenter.dispose();
+    await model.dispose();
   } catch {
-    // Pipeline disposal is best-effort; the worker is terminated after each job.
+    // Model disposal is best-effort; the worker is terminated after each job.
   }
 }
 

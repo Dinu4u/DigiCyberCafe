@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { resolve } from "node:path";
 import type {
   MediaExtractionErrorCode,
   MediaFormat,
@@ -7,6 +8,17 @@ import type {
 
 const PROCESS_TIMEOUT_MS = 45_000;
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
+const YT_DLP_EXECUTABLE = resolve(
+  process.cwd(),
+  "node_modules",
+  ".cache",
+  "yt-dlp",
+  process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp",
+);
+
+export function getYtDlpExecutablePath(): string {
+  return YT_DLP_EXECUTABLE;
+}
 
 export class MediaProviderError extends Error {
   constructor(
@@ -75,9 +87,9 @@ const ERROR_MESSAGES: Record<
       "Wait 15-30 seconds and click 'Fetch Media' again, or try a lower resolution format.",
   },
   extractor_unavailable: {
-    error: "The media download service is not available on this server.",
+    error: "The media fetch service could not start.",
     nextStep:
-      "Ask the site administrator to install or update yt-dlp and FFmpeg, then try again.",
+      "Please try again shortly. If the problem continues, contact support and include the media link.",
   },
   extraction_failed: {
     error: "The media details could not be read from this link.",
@@ -124,7 +136,7 @@ export function runYtDlp(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
     let child: ReturnType<typeof spawn>;
     try {
-      child = spawn("yt-dlp", args, {
+      child = spawn(getYtDlpExecutablePath(), args, {
         stdio: ["ignore", "pipe", "pipe"],
         windowsHide: true,
       });
@@ -249,7 +261,6 @@ function makeFormat(
 export function buildMediaFormats(
   info: YtDlpInfo,
   url: string,
-  duration?: number,
 ): MediaFormat[] {
   const primaryInfo = info.entries?.find((entry) => entry?.formats?.length) ?? info;
   const formats = primaryInfo.formats ?? [];
@@ -257,6 +268,8 @@ export function buildMediaFormats(
     (format) =>
       format.vcodec &&
       format.vcodec !== "none" &&
+      format.acodec &&
+      format.acodec !== "none" &&
       Number.isFinite(format.height) &&
       (format.ext === "mp4" || format.ext === "webm"),
   );
@@ -285,7 +298,7 @@ export function buildMediaFormats(
           extension,
           "video-with-audio",
           tier.label,
-          true,
+          false,
           approximateSizeMB(size),
         ),
       );
@@ -302,22 +315,6 @@ export function buildMediaFormats(
     const audioSize = audioFormats
       .map((format) => format.filesize ?? format.filesize_approx)
       .find((value): value is number => typeof value === "number");
-    const audioEstimate =
-      audioSize ??
-      (duration && duration > 0
-        ? (duration * 320_000) / 8
-        : undefined);
-    output.push(
-      makeFormat(
-        url,
-        "audio-mp3",
-        "mp3",
-        "audio-only",
-        "320 kbps (High Quality)",
-        true,
-        approximateSizeMB(audioEstimate),
-      ),
-    );
     if (audioFormats.some((format) => format.ext === "m4a")) {
       output.push(
         makeFormat(
@@ -326,6 +323,19 @@ export function buildMediaFormats(
           "m4a",
           "audio-only",
           "M4A (Original audio)",
+          false,
+          approximateSizeMB(audioSize),
+        ),
+      );
+    }
+    if (audioFormats.some((format) => format.ext === "webm")) {
+      output.push(
+        makeFormat(
+          url,
+          "audio-webm",
+          "webm",
+          "audio-only",
+          "WebM (Original audio)",
           false,
           approximateSizeMB(audioSize),
         ),
@@ -390,28 +400,24 @@ export function buildYtDlpFormatSelector(
   if (match) {
     const height = match[1];
     const extension = match[2];
-    const selector =
-      extension === "mp4"
-        ? `bestvideo[height=${height}][ext=mp4]+bestaudio[ext=m4a]/best[height=${height}][ext=mp4]`
-        : `bestvideo[height=${height}][ext=webm]+bestaudio[ext=webm]/best[height=${height}][ext=webm]`;
     return {
-      selector,
+      selector: `best[height=${height}][ext=${extension}][vcodec!=none][acodec!=none]/best[height<=${height}][ext=${extension}][vcodec!=none][acodec!=none]`,
       extension,
-      postprocess: ["--merge-output-format", extension],
-    };
-  }
-  if (format === "audio-mp3") {
-    return {
-      selector: "bestaudio/best",
-      extension: "mp3",
-      postprocess:       ["--extract-audio", "--audio-format", "mp3", "--audio-quality", "320K"],
+      postprocess: [],
     };
   }
   if (format === "audio-m4a") {
     return {
-      selector: "bestaudio[ext=m4a]/best[ext=m4a]",
+      selector: "bestaudio[ext=m4a]",
       extension: "m4a",
-      postprocess: ["--extract-audio", "--audio-format", "m4a"],
+      postprocess: [],
+    };
+  }
+  if (format === "audio-webm") {
+    return {
+      selector: "bestaudio[ext=webm]",
+      extension: "webm",
+      postprocess: [],
     };
   }
   if (/^image-\d{1,2}$/.test(format)) {

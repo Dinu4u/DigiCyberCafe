@@ -144,7 +144,7 @@ export function BackgroundRemover() {
             <button type="button" onClick={() => setTargetKB(null)} className="whitespace-nowrap rounded-md border border-slate-300 px-2.5 py-2 text-[11px] font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300">Original</button>
           </div>
         </label>}
-        <p className="rounded-md bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 dark:bg-slate-950 dark:text-slate-300">Uses the existing lightweight MODNet model in your browser. Its weights download once; the selected image is processed locally and is not uploaded.</p>
+        <p className="rounded-md bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 dark:bg-slate-950 dark:text-slate-300">Uses BiRefNet Lite for higher-quality local segmentation. The model downloads once (about 115 MB with WebGPU or 225 MB with WASM); your image is processed on this device and is never uploaded.</p>
       </section>
 
       <section className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900" aria-label="Background removal preview">

@@ -94,15 +94,18 @@ export function usePassportAdjustments() {
   }, []);
 
   const replaceImage = useCallback((file: File) => {
+    const nextUrl = URL.createObjectURL(file);
     if (sourceUrl) {
       URL.revokeObjectURL(sourceUrl);
     }
-    const nextUrl = URL.createObjectURL(file);
+    if (bitmap) {
+      bitmap.close();
+    }
     setSourceFile(file);
     setSourceUrl(nextUrl);
     setBitmap(null);
     setCropRect({ x: 0.16, y: 0.16, width: 0.68, height: 0.68 });
-  }, [sourceUrl]);
+  }, [bitmap, sourceUrl]);
 
   const clearImage = useCallback(() => {
     if (sourceUrl) {

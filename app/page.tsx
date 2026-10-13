@@ -131,15 +131,15 @@ const tools = [
 ];
 
 const quickTools = [
-  { label: "PDF merge", icon: FileText, href: "/tools/pdf-merge" },
-  { label: "PDF split", icon: FileText, href: "/tools/pdf-split" },
-  { label: "Downloader", icon: ArrowUpRight, href: "/tools/universal-media-downloader" },
-  { label: "PDF compressor", icon: FileText, href: "/tools/compress-pdf-to-target-kb" },
-  { label: "Sign PDF", icon: FileText, href: "/tools/sign-pdf-online" },
-  { label: "Marriage Bio Data", icon: Heart, href: "/builder/biodata" },
-  { label: "Calculate age & eligibility", icon: CalendarDays, href: "/tools/sarkari-exam-age-calculator" },
-  { label: "Mutual Fund Calculator", icon: CircleDollarSign, href: "/tools/mutual-fund-sip-lumpsum-calculator" },
-  { label: "Quotation to Invoice", icon: Receipt, href: "/tools/free-invoice-generator" },
+  { label: "PDF merge", hindi: "पीडीएफ मर्ज", icon: FileText, href: "/tools/pdf-merge" },
+  { label: "PDF split", hindi: "पीडीएफ स्प्लिट", icon: FileText, href: "/tools/pdf-split" },
+  { label: "Downloader", hindi: "मीडिया डाउनलोडर", icon: ArrowUpRight, href: "/tools/universal-media-downloader" },
+  { label: "PDF compressor", hindi: "पीडीएफ कंप्रेसर", icon: FileText, href: "/tools/compress-pdf-to-target-kb" },
+  { label: "Sign PDF", hindi: "पीडीएफ पर हस्ताक्षर करें", icon: FileText, href: "/tools/sign-pdf-online" },
+  { label: "Marriage Bio Data", hindi: "विवाह बायोडाटा", icon: Heart, href: "/builder/biodata" },
+  { label: "Calculate age & eligibility", hindi: "सरकारी परीक्षा आयु कैलकुलेटर", icon: CalendarDays, href: "/tools/sarkari-exam-age-calculator" },
+  { label: "Mutual Fund Calculator", hindi: "म्यूचुअल फंड कैलकुलेटर", icon: CircleDollarSign, href: "/tools/mutual-fund-sip-lumpsum-calculator" },
+  { label: "Quotation to Invoice", hindi: "कोटेशन से इनवॉइस", icon: Receipt, href: "/tools/free-invoice-generator" },
 ];
 
 type SearchItem = { title: string; hindi: string; description: string; href: string; icon: LucideIcon; keywords?: string };
@@ -181,8 +181,8 @@ const searchItems: SearchItem[] = [
 ];
 
 const copy = {
-  en: { getStarted: "GET STARTED", tools: "Tools for your next thing", search: "Search tools and documents", noResults: "No matching tools yet", language: "Language" },
-  hi: { getStarted: "शुरू करें", tools: "आपके अगले काम के लिए टूल्स", search: "टूल्स और दस्तावेज़ खोजें", noResults: "कोई मिलान नहीं मिला", language: "भाषा" },
+  en: { getStarted: "GET STARTED", tools: "Tools for your next thing", quickTools: "QUICK TOOLS", search: "Search tools and documents", noResults: "No matching tools yet", language: "Language" },
+  hi: { getStarted: "शुरू करें", tools: "आपके अगले काम के लिए टूल्स", quickTools: "त्वरित टूल्स", search: "टूल्स और दस्तावेज़ खोजें", noResults: "कोई मिलान नहीं मिला", language: "भाषा" },
 };
 
 export default function Home() {
@@ -236,9 +236,9 @@ export default function Home() {
     <main className="app-shell">
       <aside className={`sidebar ${mobileNavOpen ? "sidebar-open" : ""}`} style={{ zIndex: mobileNavOpen ? 50 : undefined }}>
         <button className="mobile-close" onClick={() => setMobileNavOpen(false)} aria-label="Close navigation"><X size={18} /></button>
-        <div className="workspace-label">QUICK TOOLS</div>
+        <div className="workspace-label">{text.quickTools}</div>
         <nav className="nav-list">
-          {quickTools.map(({ label, icon: Icon, href }) => <a key={label} className="nav-item" href={href} onClick={() => setMobileNavOpen(false)}><Icon size={17} strokeWidth={1.8} />{label}</a>)}
+          {quickTools.map(({ label, hindi, icon: Icon, href }) => <a key={label} className="nav-item" href={href} onClick={() => setMobileNavOpen(false)}><Icon size={17} strokeWidth={1.8} />{language === "hi" ? hindi : label}</a>)}
         </nav>
       </aside>
 

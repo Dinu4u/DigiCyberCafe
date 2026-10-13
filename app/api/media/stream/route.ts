@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PassThrough, Readable } from "node:stream";
-import { buildYtDlpFormatSelector, classifyProviderError, getMediaErrorDetails, getYtDlpImageFormats, MediaProviderError, runYtDlp, type YtDlpInfo } from "@/lib/media/ytdlp";
+import { buildYtDlpFormatSelector, classifyProviderError, getMediaErrorDetails, getYtDlpExecutablePath, getYtDlpImageFormats, MediaProviderError, runYtDlp, type YtDlpInfo } from "@/lib/media/ytdlp";
 import { validateMediaUrl } from "@/lib/utils/urlValidator";
 
 export const runtime = "nodejs";
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
     ];
 
     const { spawn } = await import("node:child_process");
-    const child = spawn("yt-dlp", childArgs, {
+    const child = spawn(getYtDlpExecutablePath(), childArgs, {
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
     });
@@ -119,7 +119,7 @@ export async function GET(request: Request) {
     });
     return new Response(stream, {
       headers: {
-        "Content-Type": contentType(selectedFormat.extension),
+        "Content-Type": contentType(selectedFormat.extension, format.startsWith("audio-")),
         "Content-Disposition": `attachment; filename="${baseName}"`,
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
@@ -187,10 +187,10 @@ export async function GET(request: Request) {
   }
 }
 
-function contentType(extension: string): string {
+function contentType(extension: string, isAudio = false): string {
   const types: Record<string, string> = {
     mp4: "video/mp4",
-    webm: "video/webm",
+    webm: isAudio ? "audio/webm" : "video/webm",
     mp3: "audio/mpeg",
     m4a: "audio/mp4",
     jpg: "image/jpeg",

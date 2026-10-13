@@ -26,6 +26,7 @@ function getDefaultCrop(imageAspect: number, outputAspect: number): CropRect {
 export function PassportPhotoCreator() {
   const workerRef = useRef<Worker | null>(null);
   const workerAbortRef = useRef<AbortController | null>(null);
+  const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const {
     presetKey,
     setPresetKey,
@@ -114,8 +115,8 @@ export function PassportPhotoCreator() {
         throw new Error("This browser cannot load image bitmaps.");
       }
       const nextBitmap = await createImageBitmap(file);
-      setBitmap(nextBitmap);
       replaceImage(file);
+      setBitmap(nextBitmap);
       setCropRect(getDefaultCrop(nextBitmap.width / nextBitmap.height, selectedPreset.width / selectedPreset.height));
     } catch {
       setError({ title: "Unsupported or unreadable photo format.", message: "The photo file could not be decoded in the browser.", steps: ["Please upload a valid JPG, PNG, or WebP photo.", "If your photo was shot on an iPhone in HEIC mode, take a screenshot or convert it to JPG before uploading."] });
@@ -346,6 +347,7 @@ export function PassportPhotoCreator() {
             <h1 className="mt-2 text-2xl font-semibold">Passport size photo</h1>
           </div>
           <div className="flex items-center gap-2">
+            <button type="button" onClick={() => uploadInputRef.current?.click()} className="inline-flex items-center gap-1.5 rounded-full border border-emerald-700 px-3 py-1.5 text-xs font-medium text-emerald-800 dark:border-emerald-400 dark:text-emerald-200"><ImagePlus size={14} />{bitmap ? "Replace photo" : "Upload photo"}</button>
             <button type="button" onClick={() => setShowAlignmentGuide(true)} aria-label="Photo alignment guide" title="Photo alignment guide" className="grid size-8 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-500 hover:text-emerald-700 dark:border-slate-700 dark:text-slate-300 dark:hover:text-emerald-300"><Info size={16} /></button>
             <button type="button" onClick={() => setRotation((value) => value - 90)} disabled={!bitmap} aria-label="Rotate photo left" title="Rotate photo left" className="grid size-8 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-500 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:text-emerald-300"><RotateCcw size={16} /></button>
             <button type="button" onClick={() => setRotation((value) => value + 90)} disabled={!bitmap} aria-label="Rotate photo right" title="Rotate photo right" className="grid size-8 place-items-center rounded-full border border-slate-200 text-slate-600 transition hover:border-emerald-500 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:text-emerald-300"><RotateCw size={16} /></button>
@@ -353,7 +355,7 @@ export function PassportPhotoCreator() {
           </div>
         </div>
 
-        <label className={`relative flex min-h-[220px] items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center transition hover:border-emerald-500 dark:border-slate-700 dark:bg-slate-950 ${sourceUrl ? "h-[min(60vh,560px)]" : "p-4"}`}>
+        <div className={`relative flex min-h-[220px] items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-center transition dark:border-slate-700 dark:bg-slate-950 ${sourceUrl ? "h-[min(60vh,560px)]" : "p-4"}`}>
           {sourceUrl && bitmap ? <div className="relative h-full w-full overflow-hidden rounded-xl" onPointerMove={handleCropPointerMove} onPointerUp={handleCropPointerUp} onPointerLeave={handleCropPointerUp}>
             <div ref={stageContainerRef} className="absolute inset-0">
               <div ref={stageRef} className="absolute" style={{ width: frameWidth ?? "100%", height: frameHeight ?? "100%", top: "50%", left: "50%", transform: "translate(-50%, -50%)", touchAction: "none" }}>
@@ -366,8 +368,11 @@ export function PassportPhotoCreator() {
             </div>
           </div> : <span className="grid justify-items-center gap-2"><ImagePlus size={28} className="text-emerald-600" /><strong className="text-base font-medium">Upload your passport or ID photo</strong><small className="max-w-xs text-sm text-slate-500">JPG, PNG, or WebP. Best with clear face, direct light, and plain background.</small></span>}
           {sourceUrl && <span className="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-slate-950/70 px-3 py-1 text-[10px] text-white">Drag crop to move; drag the corner to resize</span>}
-          <input type="file" accept="image/jpeg,image/png,image/webp" className="absolute inset-0 opacity-0" onChange={(event) => void handleFileInput(event.target.files?.[0])} />
-        </label>
+        </div>
+        <input ref={uploadInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => {
+          void handleFileInput(event.target.files?.[0]);
+          event.currentTarget.value = "";
+        }} />
         {activePanel && <section id="preview-control-section" className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
           <div className="mb-3 flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold">{activePanel === "transform" ? "Transform" : "Adjustments"}</h2>

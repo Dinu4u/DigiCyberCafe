@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       validated.url.toString(),
     ]);
     const info = JSON.parse(rawInfo) as YtDlpInfo;
-    const formats = buildMediaFormats(info, validated.url.toString(), info.duration);
+    const formats = buildMediaFormats(info, validated.url.toString());
     if (formats.length === 0) {
       return NextResponse.json(getMediaErrorDetails("extraction_failed"), { status: 422 });
     }

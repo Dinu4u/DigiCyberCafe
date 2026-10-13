@@ -14,10 +14,10 @@ export type RemovalProgress = { status: "downloading-model" | "processing"; prog
 
 type WorkerMessage =
   | { type: "progress"; status: "downloading-model" | "processing"; progress: number; message: string }
-  | { type: "success"; previewPng: Blob; maskData: ArrayBuffer; maskWidth: number; maskHeight: number; sourceWidth: number; sourceHeight: number; inferenceScale: number }
+  | { type: "success"; maskData: ArrayBuffer; maskWidth: number; maskHeight: number; sourceWidth: number; sourceHeight: number; inferenceScale: number }
   | { type: "failure"; kind: RemovalError["scenario"]; message: string };
 
-type MaskResult = Omit<Extract<WorkerMessage, { type: "success" }>, "previewPng" | "type">;
+type MaskResult = Omit<Extract<WorkerMessage, { type: "success" }>, "type">;
 export type ExportOptions = { format: "image/png" | "image/jpeg"; targetSizeKB: number | null; backgroundMode: BackgroundMode; customColor: string; backdrop: File | null };
 
 const MAX_EXPORT_EDGE = 4000;
