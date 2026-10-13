@@ -22,7 +22,7 @@ export function ExamPhotoGenerator() {
   const [customWidth, setCustomWidth] = useState(413);
   const [customHeight, setCustomHeight] = useState(531);
   const [fontSizeOffset, setFontSizeOffset] = useState(0);
-  const [targetSizeKB, setTargetSizeKB] = useState<number | null>(45);
+  const [targetSizeKB, setTargetSizeKB] = useState<number | null>(null);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>("image/jpeg");
   const [estimatedKB, setEstimatedKB] = useState<number | null>(null);
   const [compressedKB, setCompressedKB] = useState<number | null>(null);
@@ -208,15 +208,16 @@ export function ExamPhotoGenerator() {
           <fieldset className="space-y-2"><legend className="text-xs font-medium">Photo dimensions</legend><div className="grid grid-cols-3 gap-2"><PresetButton active={preset === "ssc-upsc"} onClick={() => setPreset("ssc-upsc")}>SSC / UPSC<span>3.5 × 4.5 cm</span></PresetButton><PresetButton active={preset === "passport"} onClick={() => setPreset("passport")}>Passport<span>2 × 2 inch</span></PresetButton><PresetButton active={preset === "custom"} onClick={() => setPreset("custom")}>Custom<span>Width × Height</span></PresetButton></div>{preset === "custom" && <div className="grid grid-cols-2 gap-3"><label className="grid gap-1 text-xs text-slate-600 dark:text-slate-300">Width (px)<input type="number" min="100" max="4000" value={customWidth} onChange={(event) => setCustomWidth(Number(event.target.value))} className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950" /></label><label className="grid gap-1 text-xs text-slate-600 dark:text-slate-300">Height (px)<input type="number" min="100" max="4000" value={customHeight} onChange={(event) => setCustomHeight(Number(event.target.value))} className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950" /></label></div>}</fieldset>
 
           <label className="grid gap-2 text-xs font-medium">Name font adjustment <span className="font-normal text-slate-500">{fontSizeOffset > 0 ? `+${fontSizeOffset}` : fontSizeOffset}px</span><input type="range" min="-4" max="8" value={fontSizeOffset} onChange={(event) => setFontSizeOffset(Number(event.target.value))} className="accent-emerald-700" /></label>
-          <label className="grid gap-2 text-xs font-medium">Target file size (KB)
+          <label className="grid gap-2 text-xs font-medium">Optional target file size (KB)
             <div className="flex items-center gap-2">
-              <input type="number" min={1} step={1} value={targetSizeKB ?? ""} placeholder="Enter KB" onChange={(event) => {
+              <input type="number" min={1} step={1} value={targetSizeKB ?? ""} placeholder="No size limit" onChange={(event) => {
                 const rawValue = event.target.value;
                 setTargetSizeKB(rawValue === "" ? null : Number(rawValue));
                 setCompressedKB(null);
               }} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-600 dark:border-slate-700 dark:bg-slate-950" />
-              <button type="button" onClick={() => { setTargetSizeKB(null); setCompressedKB(null); }} className="whitespace-nowrap rounded-md border border-slate-300 px-2.5 py-2 text-[11px] font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300">Original</button>
+              <button type="button" onClick={() => { setTargetSizeKB(null); setCompressedKB(null); }} className="whitespace-nowrap rounded-md border border-slate-300 px-2.5 py-2 text-[11px] font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300">No limit</button>
             </div>
+            <span className="font-normal text-slate-500">Presets set output dimensions. Leave blank to download at the selected dimensions without a KB cap.</span>
           </label>
           <label className="grid gap-1.5 text-xs font-medium">Output format<select value={outputFormat} onChange={(event) => setOutputFormat(event.target.value as OutputFormat)} className="rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm dark:border-slate-700 dark:bg-slate-950"><option value="image/png">PNG</option><option value="image/jpeg">JPEG / JPG</option><option value="image/webp">WebP</option></select></label>
         </section>

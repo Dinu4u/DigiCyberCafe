@@ -12,18 +12,20 @@ type ErrorState = RemovalError;
 
 export function BackgroundRemover() {
   const [file, setFile] = useState<File | null>(null);
+  const [processFile, setProcessFile] = useState<File | null>(null);
+  const [processAttempt, setProcessAttempt] = useState(0);
   const [sourceUrl, setSourceUrl] = useState("");
   const [backdropFile, setBackdropFile] = useState<File | null>(null);
   const [backdropUrl, setBackdropUrl] = useState("");
   const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>("transparent");
   const [customColor, setCustomColor] = useState("#F3F4F6");
   const [targetKB, setTargetKB] = useState<number | null>(null);
-  const [compareMode, setCompareMode] = useState<CompareMode>("slider");
+  const [compareMode, setCompareMode] = useState<CompareMode>("split");
   const [splitPosition, setSplitPosition] = useState(50);
   const [uiError, setUiError] = useState<ErrorState | null>(null);
   const [notice, setNotice] = useState("");
 
-  const { canvasRef, status, progress, error, outputBlob, outputDimensions, reset, exportImage } = useBackgroundRemoval(file, backgroundMode, customColor, backdropFile);
+  const { canvasRef, status, progress, error, outputBlob, outputDimensions, reset, exportImage } = useBackgroundRemoval(processFile, backgroundMode, customColor, backdropFile, processAttempt);
   const activeError = uiError ?? error;
   const busy = status === "downloading-model" || status === "processing";
 
@@ -59,7 +61,9 @@ export function BackgroundRemover() {
       if (sourceUrl) URL.revokeObjectURL(sourceUrl);
       setSourceUrl(URL.createObjectURL(selected));
       setFile(selected);
-      setNotice("Your photo stays on this device. Model files download to the browser on first use.");
+      setProcessFile(null);
+      reset();
+      setNotice("Choose a replacement background, then select Remove background to start processing locally.");
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "The browser could not decode this image.";
       setPhotoError(message, /memory|allocation|quota/i.test(message) ? "memory" : "corrupt");
@@ -93,6 +97,7 @@ export function BackgroundRemover() {
     if (sourceUrl) URL.revokeObjectURL(sourceUrl);
     setSourceUrl("");
     setFile(null);
+    setProcessFile(null);
     setUiError(null);
     setNotice("");
     reset();
@@ -127,7 +132,10 @@ export function BackgroundRemover() {
         <label className="grid gap-2 text-xs font-medium">Replacement background<select value={backgroundMode} onChange={(event) => setBackgroundMode(event.target.value as BackgroundMode)} className="rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm dark:border-slate-700 dark:bg-slate-950"><option value="transparent">Transparent</option><option value="white">Clean white</option><option value="blue">Passport blue</option><option value="gray">Soft gray</option><option value="custom">Custom color</option><option value="image">Custom backdrop image</option></select></label>
         {backgroundMode === "custom" && <label className="flex items-center justify-between gap-3 text-xs">Custom fill color<input type="color" value={customColor} onChange={(event) => setCustomColor(event.target.value)} className="h-9 w-12 rounded border border-slate-300 bg-white p-1 dark:border-slate-700 dark:bg-slate-950" /></label>}
         {backgroundMode === "image" && <label className="relative flex cursor-pointer items-center gap-2 rounded-md border border-slate-200 px-3 py-2.5 text-xs dark:border-slate-700"><ImagePlus size={15} />{backdropFile?.name ?? "Upload replacement backdrop"}<input className="absolute inset-0 cursor-pointer opacity-0" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => selectBackdrop(event.target.files?.[0])} /></label>}
-        <label className="grid gap-2 text-xs font-medium">Export size (KB)
+        <button type="button" onClick={() => { if (file) { setUiError(null); setNotice(""); setProcessFile(file); setProcessAttempt((attempt) => attempt + 1); } }} disabled={!file || busy || (backgroundMode === "image" && !backdropFile)} className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-emerald-800 px-4 py-2.5 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-emerald-400 dark:text-slate-950">
+          {busy ? <LoaderCircle size={15} className="animate-spin" /> : null}{busy ? "Removing background…" : "Remove background"}
+        </button>
+        {status === "ready" && <label className="grid gap-2 text-xs font-medium">Export size (KB)
           <div className="flex items-center gap-2">
             <input type="number" min={1} step={1} value={targetKB ?? ""} placeholder="Enter KB" onChange={(event) => {
               const rawValue = event.target.value;
@@ -135,8 +143,8 @@ export function BackgroundRemover() {
             }} className="w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-600 dark:border-slate-700 dark:bg-slate-950" />
             <button type="button" onClick={() => setTargetKB(null)} className="whitespace-nowrap rounded-md border border-slate-300 px-2.5 py-2 text-[11px] font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300">Original</button>
           </div>
-        </label>
-        <p className="rounded-md bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 dark:bg-slate-950 dark:text-slate-300">MODNet model weights download to your browser on first use. The selected image is processed locally and is not uploaded.</p>
+        </label>}
+        <p className="rounded-md bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600 dark:bg-slate-950 dark:text-slate-300">Uses the existing lightweight MODNet model in your browser. Its weights download once; the selected image is processed locally and is not uploaded.</p>
       </section>
 
       <section className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900" aria-label="Background removal preview">
@@ -148,7 +156,8 @@ export function BackgroundRemover() {
           {!file ? <div className="grid place-content-center justify-items-center gap-2 p-6 text-center text-sm text-slate-500"><ImagePlus size={28} /><span>Upload a photo to see the before-and-after preview.</span></div> : compareMode === "slider" ? <div className="relative h-full w-full"><Image fill unoptimized src={sourceUrl} alt="Original image before background removal" className="object-contain" /><canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-contain" style={{ clipPath: `inset(0 ${100 - splitPosition}% 0 0)` }} /><span className="absolute left-3 top-3 rounded bg-slate-950/65 px-2 py-1 text-[10px] text-white">Before</span><span className="absolute right-3 top-3 rounded bg-emerald-800/80 px-2 py-1 text-[10px] text-white">After</span><input aria-label="Before and after comparison" type="range" min="0" max="100" value={splitPosition} onChange={(event) => setSplitPosition(Number(event.target.value))} className="absolute bottom-3 left-4 right-4 z-10 w-[calc(100%-2rem)] accent-emerald-700" /></div> : <div className="grid h-full w-full grid-cols-2 bg-white dark:bg-slate-900"><div className="relative min-w-0"><Image fill unoptimized src={sourceUrl} alt="Original image" className="object-contain" /><span className="absolute left-2 top-2 rounded bg-slate-950/65 px-2 py-1 text-[10px] text-white">Before</span></div><div className="relative min-w-0"><canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-contain" /><span className="absolute right-2 top-2 rounded bg-emerald-800/80 px-2 py-1 text-[10px] text-white">After</span></div></div>}
           {file && status === "ready" && outputDimensions.width > 0 && <span className="absolute bottom-3 right-3 rounded bg-slate-950/70 px-2 py-1 text-[10px] text-white">{outputDimensions.width} × {outputDimensions.height}px</span>}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex gap-2"><button onClick={() => void download("image/png")} disabled={status !== "ready"} className="inline-flex items-center gap-2 rounded-md bg-emerald-800 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50 dark:bg-emerald-400 dark:text-slate-950"><Download size={15} /> Transparent PNG</button><button onClick={() => void download("image/jpeg")} disabled={status !== "ready"} className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-4 py-2.5 text-xs font-semibold disabled:opacity-50 dark:border-slate-700"><Download size={15} /> JPEG</button></div><span className="text-xs text-slate-500">{outputBlob ? `${(outputBlob.size / 1024).toFixed(1)} KB preview` : status === "ready" ? `${outputDimensions.width} × ${outputDimensions.height}px` : ""}</span></div>
+        {!processFile && file && <p className="rounded-md bg-slate-50 px-3 py-2 text-center text-[11px] text-slate-600 dark:bg-slate-950 dark:text-slate-300">Choose a background, then click Remove background to preview the result.</p>}
+        <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex gap-2"><button onClick={() => void download("image/png")} disabled={status !== "ready"} className="inline-flex items-center gap-2 rounded-md bg-emerald-800 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50 dark:bg-emerald-400 dark:text-slate-950"><Download size={15} /> PNG</button><button onClick={() => void download("image/jpeg")} disabled={status !== "ready"} className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-4 py-2.5 text-xs font-semibold disabled:opacity-50 dark:border-slate-700"><Download size={15} /> JPEG</button></div><span className="text-xs text-slate-500">{outputBlob ? `${(outputBlob.size / 1024).toFixed(1)} KB preview` : status === "ready" ? `${outputDimensions.width} × ${outputDimensions.height}px` : ""}</span></div>
         <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">Fine hair, veils, glasses, translucent materials, or similar foreground/background colors may need manual touch-up in an image editor. Large images are downscaled for inference; exports are capped to 4000px on the longest edge to protect browser memory.</p>
       </section>
     </div>

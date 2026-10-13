@@ -228,6 +228,9 @@ export function DocumentBuilder() {
   const hinduOnly = ["Rashi", "Nakshatra", "Manglik", "Gotra", "Gan"];
   const visibleFields = currentFields.filter((field) => step !== 0 || isHindu || !hinduOnly.includes(field.label));
   const selectedTemplate = templates.find((item) => item.id === draft.template) ?? templates[0];
+  const previewFields = ([0, 1, 2] as const).flatMap((section) => draft.fields[section].filter((field) => field.include && field.value.trim() && (section !== 0 || isHindu || !hinduOnly.includes(field.label))));
+  const profileFields = previewFields.filter((field) => ["name", "birth", "occupation"].includes(field.id));
+  const detailFields = previewFields.filter((field) => !["name", "birth", "occupation"].includes(field.id));
 
   function nextStep() {
     if (step === 0 && !draft.fields[0].find((field) => field.id === "name")?.value.trim()) {
@@ -306,12 +309,16 @@ export function DocumentBuilder() {
             <button type="button" className="biodata-style-trigger" aria-label="Choose template style" title="Choose template style" onClick={() => setStyleOpen(true)}><PanelsTopLeft size={19} /><span>Template style</span></button>
           </div>
           <div className={`biodata-print template-${draft.template}`} style={{ "--biodata-accent": draft.accent } as CSSProperties}>
-            {draft.godPhoto && <Image src={draft.godPhoto} alt="" width={48} height={48} unoptimized />}
-            {draft.godName && <small>{draft.godName}</small>}
-            <p>{translatedLabels[draft.language][draft.title.toUpperCase()] ?? draft.title}</p>
-            {draft.photo && <Image className="biodata-photo" src={draft.photo} alt="Biodata profile" width={120} height={150} unoptimized />}
-            {draft.fields[0].filter((field) => field.include && field.value.trim() && (isHindu || !hinduOnly.includes(field.label))).map((field) => <p key={field.id}><strong>{translatedLabels[draft.language][field.label] ?? field.label}:</strong> {field.value}</p>)}
-            {([1, 2] as const).flatMap((section) => draft.fields[section].filter((field) => field.include && field.value.trim()).map((field) => <p key={field.id}><strong>{translatedLabels[draft.language][field.label] ?? field.label}:</strong> {field.value}</p>))}
+            {(draft.godPhoto || draft.godName) && <div className="biodata-god">
+              {draft.godPhoto && <Image src={draft.godPhoto} alt="" width={48} height={48} unoptimized />}
+              {draft.godName && <small>{draft.godName}</small>}
+            </div>}
+            <p className="biodata-title">{translatedLabels[draft.language][draft.title.toUpperCase()] ?? draft.title}</p>
+            {(draft.photo || profileFields.length > 0) && <div className={`biodata-profile${draft.photo ? " has-photo" : ""}`}>
+              {draft.photo && <Image className="biodata-photo" src={draft.photo} alt="Biodata profile" width={120} height={150} unoptimized />}
+              <div className="biodata-profile-fields">{profileFields.map((field) => <p key={field.id}><strong>{translatedLabels[draft.language][field.label] ?? field.label}:</strong> {field.value}</p>)}</div>
+            </div>}
+            <div className="biodata-details">{detailFields.map((field) => <p key={field.id}><strong>{translatedLabels[draft.language][field.label] ?? field.label}:</strong> {field.value}</p>)}</div>
           </div>
         </section>
         {styleOpen && <div className="biodata-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setStyleOpen(false); }}>

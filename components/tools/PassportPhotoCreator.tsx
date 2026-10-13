@@ -13,12 +13,12 @@ type WorkerResult =
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-function getDefaultCrop(aspect: number): CropRect {
+function getDefaultCrop(imageAspect: number, outputAspect: number): CropRect {
   let width = 0.68;
-  let height = width / aspect;
+  let height = width * imageAspect / outputAspect;
   if (height > 0.78) {
     height = 0.78;
-    width = height * aspect;
+    width = height * outputAspect / imageAspect;
   }
   return { x: (1 - width) / 2, y: (1 - height) / 2, width, height };
 }
@@ -66,7 +66,7 @@ export function PassportPhotoCreator() {
   const [showAlignmentGuide, setShowAlignmentGuide] = useState(false);
   const [activePanel, setActivePanel] = useState<"transform" | "adjustments" | null>(null);
   const [notice, setNotice] = useState("");
-  const dragRef = useRef<{ startX: number; startY: number; crop: CropRect } | null>(null);
+  const dragRef = useRef<{ startX: number; startY: number; crop: CropRect; mode: "move" | "resize" } | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => () => {
@@ -75,6 +75,10 @@ export function PassportPhotoCreator() {
   }, []);
 
   const previewFilter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+
+  useEffect(() => {
+    if (bitmap) setCropRect(getDefaultCrop(bitmap.width / bitmap.height, selectedPreset.width / selectedPreset.height));
+  }, [bitmap, presetKey, selectedPreset.height, selectedPreset.width, setCropRect]);
 
   const handleFileInput = async (file?: File) => {
     if (!file) return;
@@ -96,7 +100,7 @@ export function PassportPhotoCreator() {
       const nextBitmap = await createImageBitmap(file);
       setBitmap(nextBitmap);
       replaceImage(file);
-      setCropRect(getDefaultCrop(nextBitmap.width / nextBitmap.height));
+      setCropRect(getDefaultCrop(nextBitmap.width / nextBitmap.height, selectedPreset.width / selectedPreset.height));
     } catch {
       setError({ title: "Unsupported or unreadable photo format.", message: "The photo file could not be decoded in the browser.", steps: ["Please upload a valid JPG, PNG, or WebP photo.", "If your photo was shot on an iPhone in HEIC mode, take a screenshot or convert it to JPG before uploading."] });
     }
@@ -104,7 +108,15 @@ export function PassportPhotoCreator() {
 
   const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!stageRef.current) return;
-    dragRef.current = { startX: event.clientX, startY: event.clientY, crop: cropRect };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = { startX: event.clientX, startY: event.clientY, crop: cropRect, mode: "move" };
+  };
+
+  const handleCropResizePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (!stageRef.current) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = { startX: event.clientX, startY: event.clientY, crop: cropRect, mode: "resize" };
   };
 
   const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -112,7 +124,17 @@ export function PassportPhotoCreator() {
     const stageRect = stageRef.current.getBoundingClientRect();
     const deltaX = (event.clientX - dragRef.current.startX) / stageRect.width;
     const deltaY = (event.clientY - dragRef.current.startY) / stageRect.height;
-    const nextCrop = { ...dragRef.current.crop, x: clamp(dragRef.current.crop.x + deltaX, 0, 1 - dragRef.current.crop.width), y: clamp(dragRef.current.crop.y + deltaY, 0, 1 - dragRef.current.crop.height) };
+    let nextCrop: CropRect;
+    if (dragRef.current.mode === "move") {
+      nextCrop = { ...dragRef.current.crop, x: clamp(dragRef.current.crop.x + deltaX, 0, 1 - dragRef.current.crop.width), y: clamp(dragRef.current.crop.y + deltaY, 0, 1 - dragRef.current.crop.height) };
+    } else {
+      const imageAspect = bitmap ? bitmap.width / bitmap.height : 1;
+      const cropAspect = (selectedPreset.width / selectedPreset.height) / imageAspect;
+      const deltaHeight = (deltaY + deltaX / cropAspect) / 2;
+      const maxHeight = Math.min(1 - dragRef.current.crop.y, (1 - dragRef.current.crop.x) / cropAspect);
+      const height = clamp(dragRef.current.crop.height + deltaHeight, Math.min(0.12, maxHeight), maxHeight);
+      nextCrop = { ...dragRef.current.crop, width: height * cropAspect, height };
+    }
     dragRef.current = { ...dragRef.current, crop: nextCrop };
     setCropRect(nextCrop);
   };
@@ -216,8 +238,8 @@ export function PassportPhotoCreator() {
       workerAbortRef.current = workerAbort;
       const widthPx = Math.max(100, Math.round(selectedPreset.width));
       const heightPx = Math.max(100, Math.round(selectedPreset.height));
-      const cropW = Math.max(200, Math.round(bitmap.width * cropRect.width));
-      const cropH = Math.max(200, Math.round(bitmap.height * cropRect.height));
+      const cropW = Math.round(bitmap.width * cropRect.width);
+      const cropH = Math.round(bitmap.height * cropRect.height);
 
       if (cropW < 200 || cropH < 200) {
         throw Object.assign(new Error("Selected photo region is too small for passport printing."), { type: "small-region" });
@@ -316,7 +338,16 @@ export function PassportPhotoCreator() {
         </div>
 
         <label className={`relative flex min-h-[220px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 text-center transition hover:border-emerald-500 dark:border-slate-700 dark:bg-slate-950 ${sourceUrl ? "h-[min(60vh,560px)]" : ""}`}>
-          {sourceUrl ? <div className="relative h-full w-full overflow-hidden rounded-xl" ref={stageRef} onPointerMove={handleCropPointerMove} onPointerUp={handleCropPointerUp} onPointerLeave={handleCropPointerUp}><div className="relative h-full w-full"><Image unoptimized src={sourceUrl} alt="Passport photo source" fill className="object-contain" style={{ filter: previewFilter, transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flipHorizontal ? -1 : 1})`, transition: "transform 0.12s ease-out, filter 0.12s ease-out" }} /></div><div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,transparent_68%,rgba(15,23,42,0.22)_100%)]" /><div onPointerDown={handleCropPointerDown} className="absolute border-2 border-emerald-400 bg-emerald-500/10 shadow-[0_0_0_9999px_rgba(15,23,42,0.36)]" style={{ left: `${cropRect.x * 100}%`, top: `${cropRect.y * 100}%`, width: `${cropRect.width * 100}%`, height: `${cropRect.height * 100}%`, aspectRatio: `${selectedPreset.width}/${selectedPreset.height}` }}><div className="absolute inset-0 grid place-items-center text-[10px] font-semibold uppercase tracking-[0.20em] text-emerald-400">Crop</div></div></div> : <span className="grid justify-items-center gap-2"><ImagePlus size={28} className="text-emerald-600" /><strong className="text-base font-medium">Upload your passport or ID photo</strong><small className="max-w-xs text-sm text-slate-500">JPG, PNG, or WebP. Best with clear face, direct light, and plain background.</small></span>}
+          {sourceUrl && bitmap ? <div className="relative h-full w-full overflow-hidden rounded-xl" onPointerMove={handleCropPointerMove} onPointerUp={handleCropPointerUp} onPointerLeave={handleCropPointerUp}>
+            <div ref={stageRef} className="absolute inset-0 m-auto" style={{ height: "100%", width: "auto", maxWidth: "100%", aspectRatio: `${bitmap.width}/${bitmap.height}`, touchAction: "none" }}>
+              <Image unoptimized src={sourceUrl} alt="Passport photo source" fill className="object-contain" style={{ filter: previewFilter, transform: `scale(${zoom / 100}) rotate(${rotation}deg) scaleX(${flipHorizontal ? -1 : 1})`, transition: "transform 0.12s ease-out, filter 0.12s ease-out" }} />
+              <div onPointerDown={handleCropPointerDown} className="absolute cursor-move border-2 border-emerald-400 bg-emerald-500/10 shadow-[0_0_0_9999px_rgba(15,23,42,0.36)]" style={{ left: `${cropRect.x * 100}%`, top: `${cropRect.y * 100}%`, width: `${cropRect.width * 100}%`, height: `${cropRect.height * 100}%`, touchAction: "none" }}>
+                <div className="pointer-events-none absolute inset-0 grid place-items-center text-[10px] font-semibold uppercase tracking-[0.20em] text-emerald-400">Crop</div>
+                <button type="button" aria-label="Resize crop area" onPointerDown={handleCropResizePointerDown} className="absolute -bottom-2 -right-2 size-5 rounded-full border-2 border-white bg-emerald-500 shadow" />
+              </div>
+            </div>
+          </div> : <span className="grid justify-items-center gap-2"><ImagePlus size={28} className="text-emerald-600" /><strong className="text-base font-medium">Upload your passport or ID photo</strong><small className="max-w-xs text-sm text-slate-500">JPG, PNG, or WebP. Best with clear face, direct light, and plain background.</small></span>}
+          {sourceUrl && <span className="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 rounded-full bg-slate-950/70 px-3 py-1 text-[10px] text-white">Drag crop to move; drag the corner to resize</span>}
           <input type="file" accept="image/jpeg,image/png,image/webp" className="absolute inset-0 opacity-0" onChange={(event) => void handleFileInput(event.target.files?.[0])} />
         </label>
         {activePanel && <section id="preview-control-section" className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">

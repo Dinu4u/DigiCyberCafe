@@ -146,10 +146,19 @@
 .biodata-live-preview{border-top:1px solid #e6e9e4;padding-top:17px}
 .biodata-live-preview>div:first-child{display:flex;justify-content:space-between;margin-bottom:12px;color:#526055;font:12px Arial,sans-serif}
 .biodata-print{min-height:250px;padding:28px;border:2px solid var(--biodata-accent);color:#30352f;text-align:center;background:#fffdf9;font:13px/1.6 Georgia,serif;overflow-wrap:anywhere}
-.biodata-print>p:first-of-type{margin:12px 0 18px;color:var(--biodata-accent);font:700 19px Georgia,serif}
+.biodata-print>.biodata-title{margin:12px 0 18px;color:var(--biodata-accent);font:700 19px Georgia,serif;text-align:center}
 .biodata-print>p{margin:7px 0}
 .biodata-print>p strong{color:var(--biodata-accent)}
 .biodata-print>img:not(.biodata-photo){object-fit:contain}
+.biodata-god{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 auto;color:var(--biodata-accent);font-weight:700}
+.biodata-profile{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:16px;margin:0 0 20px;text-align:left}
+.biodata-profile.has-photo{grid-template-columns:120px minmax(0,1fr)}
+.biodata-profile .biodata-photo{width:120px;height:150px;object-fit:cover;border-radius:5px}
+.biodata-profile-fields{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
+.biodata-profile-fields p{margin:0}
+.biodata-profile-fields strong,.biodata-details strong{color:var(--biodata-accent)}
+.biodata-details{text-align:left}
+.biodata-details>p{margin:7px 0}
 .biodata-print.template-botanical{border-radius:18px;background:#f5faf5}
 .biodata-print.template-modern{text-align:left;border-width:7px 0 0;background:#fff;font-family:Arial,sans-serif}
 @media(max-width:640px){.biodata-wizard{width:calc(100% - 20px);margin:12px auto 32px;padding:14px}.biodata-steps{max-width:100%}.biodata-steps button{gap:5px;font-size:10px}.biodata-steps button strong{min-width:43px;height:26px;padding:0 6px;font-size:10px}.biodata-step-connector{min-width:8px;margin:0 6px}.biodata-settings{grid-template-columns:1fr}.biodata-field-row{grid-template-columns:minmax(0,1fr) auto;gap:6px}.biodata-include{grid-column:1;grid-row:2;padding:0 0 8px}.biodata-field-actions{grid-column:2;grid-row:1 / span 2;align-self:center;flex-wrap:wrap}.biodata-add-field{flex-wrap:wrap}.biodata-add-field button{flex:0 0 auto}.biodata-style-trigger{padding:7px 9px}.biodata-template-modal>header h2{font-size:17px}}

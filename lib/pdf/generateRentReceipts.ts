@@ -154,9 +154,14 @@ function drawReceipt(page: PDFPage, rect: Rect, data: ReceiptLayout) {
   page.drawRectangle({ x: stampX, y: stampY, width: 91 * scale, height: 35 * scale, borderColor: rgb(0.66, 0.69, 0.66), borderWidth: 0.6 * scale });
   const stampWidth = 80 * scale;
   const stampHeight = stampWidth * data.stampLabel.height / data.stampLabel.width;
-  page.drawImage(data.stampLabel, { x: stampX + 5 * scale, y: stampY + 15 * scale, width: stampWidth, height: stampHeight });
-  page.drawLine({ start: { x: stampX - 18 * scale, y: stampY + 8 * scale }, end: { x: right, y: stampY + 8 * scale }, color: rgb(0.28, 0.31, 0.28), thickness: 0.6 * scale });
-  page.drawText("Landlord signature", { x: stampX - 18 * scale, y: stampY - 2 * scale, size: 6.5 * scale, font: regular });
+  page.drawImage(data.stampLabel, { x: stampX + 5 * scale, y: stampY + (35 * scale - stampHeight) / 2, width: stampWidth, height: stampHeight });
+  const signatureRight = stampX - 10 * scale;
+  const signatureWidth = signatureRight - left;
+  const signatureLabel = "Landlord signature";
+  const signatureLabelWidth = regular.widthOfTextAtSize(signatureLabel, 6.5 * scale);
+  const signatureCenter = left + Math.max(0, signatureWidth - signatureLabelWidth) / 2;
+  page.drawLine({ start: { x: left, y: stampY + 8 * scale }, end: { x: signatureRight, y: stampY + 8 * scale }, color: rgb(0.28, 0.31, 0.28), thickness: 0.6 * scale });
+  page.drawText(signatureLabel, { x: signatureCenter, y: stampY - 2 * scale, size: 6.5 * scale, font: regular });
 }
 
 function drawWrappedField(page: PDFPage, label: string, value: string, x: number, y: number, width: number, regular: PDFFont, bold: PDFFont, scale: number) {

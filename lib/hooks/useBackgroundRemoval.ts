@@ -23,7 +23,7 @@ export type ExportOptions = { format: "image/png" | "image/jpeg"; targetSizeKB: 
 const MAX_EXPORT_EDGE = 4000;
 const MAX_EXPORT_PIXELS = 16_000_000;
 
-export function useBackgroundRemoval(source: File | null, backgroundMode: BackgroundMode, customColor: string, backdrop: File | null) {
+export function useBackgroundRemoval(source: File | null, backgroundMode: BackgroundMode, customColor: string, backdrop: File | null, runId = 0) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const workerRef = useRef<Worker | null>(null);
   const [maskResult, setMaskResult] = useState<MaskResult | null>(null);
@@ -120,7 +120,7 @@ export function useBackgroundRemoval(source: File | null, backgroundMode: Backgr
       workerRef.current?.terminate();
       workerRef.current = null;
     };
-  }, [source]);
+  }, [source, runId]);
 
   useEffect(() => {
     if (!source || !maskResult || !canvasRef.current) return;
