@@ -63,12 +63,21 @@ export async function translatePdfPages(pages: ExtractedPdfPage[], sourceLanguag
 }
 
 async function translateTextChunk(text: string, sourceLanguage: string, targetLanguage: string) {
-  const query = new URLSearchParams({ q: text, langpair: `${sourceLanguage}|${targetLanguage}` });
-  const response = await fetch(`https://api.mymemory.translated.net/get?${query}`);
-  if (!response.ok) throw new Error("The translation provider is unavailable. Try again later.");
-  const result = await response.json() as { responseStatus?: number; responseData?: { translatedText?: string } };
-  if (result.responseStatus !== 200 || !result.responseData?.translatedText) throw new Error("The translation provider could not translate this text.");
-  return decodeHtmlEntities(result.responseData.translatedText);
+  const response = await fetch("/api/translate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, sourceLanguage, targetLanguage }),
+  });
+  let result: { translatedText?: string; error?: string };
+  try {
+    result = await response.json() as { translatedText?: string; error?: string };
+  } catch {
+    throw new Error("The translation service returned an invalid response. Please try again.");
+  }
+  if (!response.ok || !result.translatedText) {
+    throw new Error(result.error ?? "The translation service could not translate this text. Please try again later.");
+  }
+  return decodeHtmlEntities(result.translatedText);
 }
 
 function splitTextIntoChunks(text: string, maximumLength: number) {
