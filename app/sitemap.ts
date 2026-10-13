@@ -1,0 +1,68 @@
+import type { MetadataRoute } from "next";
+
+const siteUrl = "https://ecybercafe.in";
+const tools = [
+  "/tools/barcode-qr-generator",
+  "/tools/compress-pdf-to-target-kb",
+  "/tools/corporate-email-format",
+  "/tools/free-invoice-generator",
+  "/tools/hra-rent-receipt-generator",
+  "/tools/image-background-remover",
+  "/tools/id-card-front-back-joiner",
+  "/tools/image-to-pdf-converter",
+  "/tools/merge-pdf-files",
+  "/tools/mutual-fund-sip-lumpsum-calculator",
+  "/tools/passport-photo-maker",
+  "/tools/pdf",
+  "/tools/pdf-compress",
+  "/tools/pdf-editor",
+  "/tools/pdf-watermark",
+  "/tools/photo-enhancer-online",
+  "/tools/photo-name-date-generator",
+  "/tools/sarkari-exam-age-calculator",
+  "/tools/ppt-to-pdf",
+  "/tools/sign-pdf-online",
+  "/tools/split-pdf-pages",
+  "/tools/target-kb-file-resizer",
+  "/tools/text-to-pdf-converter",
+  "/tools/translate-pdf-document",
+  "/tools/universal-media-downloader",
+  "/tools/word-excel-to-pdf",
+  "/tools/image-to-pdf",
+  "/tools/downloader",
+];
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+  return [
+    {
+      url: siteUrl,
+      lastModified,
+      changeFrequency: "daily",
+      priority: 1,
+    },
+    {
+      url: `${siteUrl}/builder/biodata`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...["/about-us", "/contact-us", "/privacy-policy", "/terms-of-service"].map((path) => ({
+      url: `${siteUrl}${path}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
+    })),
+    ...tools.map((path) => ({
+      url: `${siteUrl}${path}`,
+      lastModified,
+      changeFrequency: "daily" as const,
+      priority:
+        path === "/tools/pdf" ||
+        path === "/tools/sarkari-exam-age-calculator" ||
+        path === "/tools/mutual-fund-sip-lumpsum-calculator"
+          ? 0.9
+          : 0.8,
+    })),
+  ];
+}

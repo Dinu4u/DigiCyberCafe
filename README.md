@@ -32,3 +32,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+### Advertising rollout
+
+Ad slots default to `AUDIT_PRE_APPROVAL`, which reserves layout space without
+loading advertising scripts. Set `NEXT_PUBLIC_AD_MODE=LIVE_ADSENSE` only after
+the site has the required publisher approval and consent setup for its audience,
+and configure `NEXT_PUBLIC_ADSENSE_CLIENT_ID` plus the relevant numeric slot
+IDs from `.env.example`. Use `DISABLED` to remove ad slots entirely. Review the
+live site's policies, consent flow, and Google publisher settings before enabling
+ads; no implementation can guarantee an approval outcome.
+
+### Analytics and performance
+
+Vercel Speed Insights is included for production deployments; enable it in the
+Vercel project dashboard to review real-user performance and Core Web Vitals.
+For visitor analytics, set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 web
+Measurement ID (`G-...`) in the local environment or Vercel project settings,
+then redeploy. Google Analytics loads only after a visitor accepts analytics;
+visitors can reject or revise their choice using **Analytics settings** in the
+footer. No Measurement ID means GA4 stays inactive.

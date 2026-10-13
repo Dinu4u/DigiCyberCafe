@@ -1,0 +1,88 @@
+.page {
+  display: grid;
+  min-height: 65vh;
+  place-items: center;
+  padding: 52px 20px;
+  background: #f7f8f5;
+}
+
+.card {
+  width: min(510px, 100%);
+  border: 1px solid #e1e8e0;
+  border-radius: 14px;
+  padding: clamp(25px, 5vw, 42px);
+  background: #fff;
+  box-shadow: 0 18px 48px #1833240d;
+}
+
+.icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  color: #4c7653;
+  background: #edf4ec;
+}
+
+.eyebrow {
+  margin: 22px 0 9px;
+  color: #68816b;
+  font: 700 9px Arial, sans-serif;
+  letter-spacing: .12em;
+}
+
+.card h1 {
+  margin: 0;
+  color: #28392e;
+  font: 400 clamp(27px, 5vw, 36px)/1.12 Georgia, serif;
+}
+
+.message {
+  margin: 13px 0 0;
+  color: #78847b;
+  font: 13px/1.65 Arial, sans-serif;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0 14px;
+  font: 700 11px Arial, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary {
+  color: #fff;
+  background: #315e3d;
+}
+
+.primary:hover {
+  background: #244c30;
+}
+
+.secondary {
+  border-color: #dfe7de;
+  color: #506a55;
+  background: #fff;
+}
+
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: 2px solid #719578;
+  outline-offset: 3px;
+}

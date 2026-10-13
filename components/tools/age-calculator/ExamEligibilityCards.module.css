@@ -1,0 +1,116 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.card {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #e2e8e2;
+  border-left: 3px solid #6b9a76;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.over_age {
+  border-left-color: #c77268;
+}
+
+.under_age {
+  border-left-color: #c0913f;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.organization {
+  color: #8a948c;
+  font: 700 10px Arial, sans-serif;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #4f805b;
+  font: 700 11px Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.over_age .status {
+  color: #a95b52;
+}
+
+.under_age .status {
+  color: #9a702b;
+}
+
+.card h3 {
+  margin: 12px 0 5px;
+  color: #334438;
+  font: 400 16px/1.35 Georgia, serif;
+}
+
+.ageRange,
+.statusText,
+.note {
+  margin: 0;
+  color: #69776c;
+  font: 11px/1.55 Arial, sans-serif;
+}
+
+.statusText {
+  margin-top: 8px;
+  color: #3e6648;
+  font-weight: 700;
+}
+
+.over_age .statusText {
+  color: #9f574e;
+}
+
+.under_age .statusText {
+  color: #8c682c;
+}
+
+.note {
+  margin-top: 8px;
+  color: #89928a;
+}
+
+.card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  color: #53775b;
+  font: 700 11px Arial, sans-serif;
+  text-decoration: none;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  margin: 0;
+  border: 1px dashed #dbe4dc;
+  border-radius: 7px;
+  padding: 24px;
+  color: #7e897f;
+  font: 13px Arial, sans-serif;
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
