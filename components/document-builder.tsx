@@ -241,7 +241,7 @@ export function DocumentBuilder() {
   return (
     <main className="builder-shell biodata-shell">
       <header className="builder-topbar">
-        <Link className="back-link" href="/"><ArrowLeft size={17} /> Biodata</Link>
+        <Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link>
         <div className="builder-actions">
           <button className="secondary-button" onClick={saveDraft}><Save size={16} /> {saved ? "Saved locally" : "Save draft"}</button>
           <button className="primary-button" onClick={() => window.print()}><Download size={16} /> Export PDF</button>

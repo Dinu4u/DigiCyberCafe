@@ -116,8 +116,8 @@ export function MediaDownloader() {
   return (
     <main className={styles.page}>
       <header className="builder-topbar">
-        <Link className="back-link" href="/">
-          <ArrowLeft size={17} /> Media downloader
+        <Link className="back-link" href="/#tools">
+          <ArrowLeft size={17} /> All tools
         </Link>
       </header>
 

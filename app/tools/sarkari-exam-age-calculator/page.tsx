@@ -36,8 +36,8 @@ export default function SarkariExamAgeCalculatorPage() {
   return (
     <main className="tool-shell">
       <header className="builder-topbar">
-        <Link className="back-link" href="/">
-          <ArrowLeft size={17} /> Calculate age &amp; eligibility
+        <Link className="back-link" href="/#tools">
+          <ArrowLeft size={17} /> All tools
         </Link>
       </header>
       <div style={{ maxWidth: 1115, margin: "0 auto", padding: "30px 5.2%" }}>

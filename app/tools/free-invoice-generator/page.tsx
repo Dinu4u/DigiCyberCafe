@@ -42,8 +42,8 @@ export default function FreeInvoiceGeneratorPage() {
     <main className="min-h-screen bg-[#f6f8f6] px-4 pb-14 text-slate-900 sm:px-6">
       <div className="mx-auto max-w-6xl">
         <header className="py-5 print:hidden">
-          <Link href="/" className="back-link">
-            <ArrowLeft size={17} /> Quotation to Invoice
+          <Link href="/#tools" className="back-link">
+            <ArrowLeft size={17} /> All tools
           </Link>
         </header>
         <JsonLdSchema

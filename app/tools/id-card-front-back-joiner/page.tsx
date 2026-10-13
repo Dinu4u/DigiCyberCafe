@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function IdCardJoinerPage() {
   return (
     <main className="tool-shell">
-      <header className="builder-topbar"><Link className="back-link" href="/"><ArrowLeft size={17} /> ID card Joiner</Link></header>
+      <header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header>
       <JsonLdSchema name="ID Card Front and Back Joiner" path="/tools/id-card-front-back-joiner" description={description} faqs={faqs} howTo={{ name: "Arrange ID card front and back on a print sheet", steps }} />
       <AdBannerSlot slotId="photo-tool-leaderboard" format="leaderboard" className="mx-auto my-5 max-w-5xl px-4" />
       <IdCardJoiner />

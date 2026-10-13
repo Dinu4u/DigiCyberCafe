@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export default function PassportPhotoMakerPage() {
   return (
     <main className="tool-shell">
-      <header className="builder-topbar"><Link className="back-link" href="/"><ArrowLeft size={17} /> Passport Photo</Link></header>
+      <header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header>
       <JsonLdSchema name="Passport Size Photo Maker" path="/tools/passport-photo-maker" description={description} faqs={faqs} howTo={{ name: "Create a passport or visa photo", steps }} />
       <AdBannerSlot slotId="photo-tool-leaderboard" format="leaderboard" className="mx-auto my-5 max-w-5xl px-4" />
       <PassportPhotoCreator />

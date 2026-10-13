@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default function ImageBackgroundRemoverPage() {
   return (
     <main className="tool-shell">
-      <header className="builder-topbar"><Link className="back-link" href="/"><ArrowLeft size={17} /> Background Remover</Link></header>
+      <header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header>
       <JsonLdSchema name="Image Background Remover" path="/tools/image-background-remover" description={description} faqs={faqs} howTo={{ name: "Remove an image background", steps }} />
       <AdBannerSlot slotId="photo-tool-leaderboard" format="leaderboard" className="mx-auto my-5 max-w-5xl px-4" />
       <BackgroundRemover />

@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default function TargetKbFileResizerPage() {
   return <div className="tool-shell">
     <header className="builder-topbar">
-      <Link className="back-link" href="/"><ArrowLeft size={17} /> File Resizer</Link>
+      <Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link>
     </header>
     <JsonLdSchema
       name="Target KB File Resizer"

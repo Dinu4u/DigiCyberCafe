@@ -63,7 +63,7 @@ const faqs = [
 export default function PhotoEnhancerOnlinePage() {
   return <div className="tool-shell">
     <header className="builder-topbar">
-      <Link className="back-link" href="/"><ArrowLeft size={17} /> Photo Enhancer</Link>
+      <Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link>
     </header>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
     <PhotoEnhancer />

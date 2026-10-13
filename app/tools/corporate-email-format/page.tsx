@@ -10,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function CorporateEmailFormatPage() {
-  return <main className="tool-shell"><header className="builder-topbar"><Link className="back-link" href="/"><ArrowLeft size={17} /> Email Generator</Link></header><CorporateEmailGenerator /></main>;
+  return <main className="tool-shell"><header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header><CorporateEmailGenerator /></main>;
 }
