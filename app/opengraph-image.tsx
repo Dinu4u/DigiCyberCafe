@@ -56,6 +56,8 @@ export default function OpenGraphImage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div
             style={{
+              display: "flex",
+              flexDirection: "column",
               maxWidth: 960,
               fontFamily: "Georgia, serif",
               fontSize: 66,

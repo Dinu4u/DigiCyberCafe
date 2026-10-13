@@ -321,10 +321,10 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
             Gregorian (English)
           </button>
           <button
-            className={calendarMode === "hindi" ? styles.active : ""}
+            className={calendarMode === "hindu" ? styles.active : ""}
             type="button"
-            aria-pressed={calendarMode === "hindi"}
-            onClick={() => setCalendarMode("hindi")}
+            aria-pressed={calendarMode === "hindu"}
+            onClick={() => setCalendarMode("hindu")}
           >
             Hindu lunar Panchang
           </button>
