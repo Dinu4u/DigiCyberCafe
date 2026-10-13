@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function PdfPage() {
-  return <PdfToolShell><PdfToolsHub /></PdfToolShell>;
+  return <PdfToolShell isHub><PdfToolsHub /></PdfToolShell>;
 }

@@ -1,5 +1,4 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import JSZip from "jszip";
 import * as XLSX from "@e965/xlsx";
 import { renderAsync } from "docx-preview";
 import html2canvas from "html2canvas";
@@ -33,10 +32,7 @@ export async function splitPdf(buffer: ArrayBuffer, pageRanges: string): Promise
     outputs[`${selection.label}.pdf`] = await document.save();
   }
 
-  if (Object.keys(outputs).length <= 1) return outputs;
-  const archive = new JSZip();
-  Object.entries(outputs).forEach(([name, bytes]) => archive.file(name, bytes));
-  return { "split-pdf-pages.zip": await archive.generateAsync({ type: "uint8array" }) };
+  return outputs;
 }
 
 function parsePageRanges(input: string, pageCount: number) {
