@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AD_CONFIG } from "@/config/adPolicy";
-import { AnalyticsSettingsButton } from "@/components/analytics/AnalyticsConsent";
 
 const primaryLinks = [
   { href: "/#tools", label: "All Tools" },
@@ -76,7 +75,6 @@ export function Footer() {
                 </Link>
               ))}
             </nav>
-            <AnalyticsSettingsButton />
             <p className="text-xs text-slate-400">
               © {new Date().getFullYear()} DigiCyberCafe
             </p>

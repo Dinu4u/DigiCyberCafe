@@ -79,12 +79,11 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-xl font-semibold text-slate-900">5. Cookies, analytics, Google services, and advertising</h2>
           <p className="mt-2">
             Essential session or security technologies may be used for sign-in and
-            service operation. If Google Analytics is configured, it is loaded only
-            after you accept analytics in the consent panel. Your choice is stored
-            in this browser&apos;s local storage; you can reject or change your
-            selection using Analytics settings in the footer. Google Analytics may
-            use cookies or similar technologies and process technical information
-            such as page views, device/browser details, and approximate location.
+            service operation. Google Analytics is loaded automatically when a
+            page is visited; there is no analytics opt-in prompt on this site.
+            Google Analytics may use cookies or similar technologies and process
+            technical information such as page views, device/browser details, and
+            approximate location.
             Google&apos;s data practices are described in its{" "}
             <a className="underline" href="https://policies.google.com/privacy" rel="noreferrer" target="_blank">
               Privacy Policy

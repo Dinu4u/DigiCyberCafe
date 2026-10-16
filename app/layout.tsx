@@ -6,7 +6,6 @@ import { Header } from "@/components/navigation/Header";
 import { Footer } from "@/components/navigation/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { AD_CONFIG } from "@/config/adPolicy";
-import { AnalyticsConsent } from "@/components/analytics/AnalyticsConsent";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/seo/site";
 
@@ -84,12 +83,25 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-IN" data-scroll-behavior="smooth">
+      <head>
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-RJPXQHF432"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RJPXQHF432');`,
+          }}
+        />
+      </head>
       <body>
         <Header />
         <JsonLd />
         {children}
         <Footer />
-        <AnalyticsConsent />
         <SpeedInsights />
       </body>
     </html>

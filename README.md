@@ -47,11 +47,8 @@ ads; no implementation can guarantee an approval outcome.
 
 Vercel Speed Insights is included for production deployments; enable it in the
 Vercel project dashboard to review real-user performance and Core Web Vitals.
-Google Analytics is configured with the site's GA4 Measurement ID by default.
-To use a different ID, set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in the local
-environment or Vercel project settings, then redeploy. Analytics loads only
-after a visitor accepts; visitors can reject or change their choice using
-**Analytics settings** in the footer.
+Google Analytics is installed globally with the site's GA4 Measurement ID and
+loads on every page visit.
 
 ### Google Search Console
 
