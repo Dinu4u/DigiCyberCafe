@@ -247,24 +247,13 @@ export default function Home() {
       <section className="main-content">
         <div className="content-wrap">
           <AdBannerSlot slotId="home-leaderboard" format="leaderboard" className="mb-8" />
-          <section className="section-block !mt-0" aria-labelledby="home-heading">
-            <p className="eyebrow">Free online tools</p>
-            <h1 id="home-heading" className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-              PDF, photo and document tools for everyday tasks
-            </h1>
-            <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-              DigiCyberCafe is an independent online utility site operated from
-              Patna, India. Create and prepare documents, resize exam photos,
-              work with PDFs, and use practical tools for office and daily tasks.
-              Supported file workflows run in your browser; each tool explains
-              its own processing and privacy limits.
-            </p>
-          </section>
-          <section id="tools" className="section-block !mt-0">
+          <section id="tools" className="section-block !mt-0" aria-labelledby="home-heading">
             <div className="section-heading">
               <div>
                 <p className="eyebrow">{text.getStarted}</p>
-                <h2>{text.tools}</h2>
+                <h1 id="home-heading" className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                  {text.tools}
+                </h1>
               </div>
             </div>
             <div className="tools-grid">
@@ -278,43 +267,6 @@ export default function Home() {
                   <ArrowUpRight className="card-arrow" size={18} />
                 </a>
               ))}
-            </div>
-          </section>
-          <section className="section-block" aria-labelledby="home-faq-heading">
-            <h2 id="home-faq-heading" className="text-2xl font-semibold tracking-tight text-slate-900">
-              About DigiCyberCafe
-            </h2>
-            <div className="mt-5 grid gap-5 sm:grid-cols-2">
-              <div>
-                <h3 className="font-semibold text-slate-900">Are DigiCyberCafe tools free?</h3>
-                <p className="mt-1 leading-6 text-slate-600">
-                  Many tools are free to use. Check the individual tool for any
-                  feature limits, account requirements, or third-party services.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-900">Are my files uploaded?</h3>
-                <p className="mt-1 leading-6 text-slate-600">
-                  It depends on the tool. Some process files in your browser;
-                  others use server-side services. Review the privacy note on
-                  the tool you choose.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-900">Is DigiCyberCafe a government website?</h3>
-                <p className="mt-1 leading-6 text-slate-600">
-                  No. DigiCyberCafe is an independent project, not a government
-                  agency or exam authority. Always follow the current official
-                  instructions for applications and eligibility.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-900">Where is DigiCyberCafe operated?</h3>
-                <p className="mt-1 leading-6 text-slate-600">
-                  DigiCyberCafe is operated from Patna, Bihar, India. Its online
-                  tools are available to users beyond that location.
-                </p>
-              </div>
             </div>
           </section>
         </div>
