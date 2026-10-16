@@ -28,41 +28,15 @@ const tools = [
   "/tools/translate-pdf-document",
   "/tools/universal-media-downloader",
   "/tools/word-excel-to-pdf",
-  "/tools/image-to-pdf",
-  "/tools/downloader",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
   return [
-    {
-      url: siteUrl,
-      lastModified,
-      changeFrequency: "daily",
-      priority: 1,
-    },
-    {
-      url: `${siteUrl}/builder/biodata`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
+    { url: siteUrl },
+    { url: `${siteUrl}/builder/biodata` },
     ...["/about-us", "/contact-us", "/privacy-policy", "/terms-of-service"].map((path) => ({
       url: `${siteUrl}${path}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.4,
     })),
-    ...tools.map((path) => ({
-      url: `${siteUrl}${path}`,
-      lastModified,
-      changeFrequency: "daily" as const,
-      priority:
-        path === "/tools/pdf" ||
-        path === "/tools/sarkari-exam-age-calculator" ||
-        path === "/tools/mutual-fund-sip-lumpsum-calculator"
-          ? 0.9
-          : 0.8,
-    })),
+    ...tools.map((path) => ({ url: `${siteUrl}${path}` })),
   ];
 }

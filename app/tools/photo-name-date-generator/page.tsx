@@ -11,7 +11,7 @@ const description = "Generate passport size photos with printed candidate name a
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/photo-name-date-generator" },
-  title: "SSC & UPSC Photo with Name and Date (DOP) Maker | Free Target KB Resizer",
+  title: "SSC and UPSC Exam Photo Name and Date Maker",
   description,
 };
 

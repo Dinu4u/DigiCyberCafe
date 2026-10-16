@@ -22,7 +22,7 @@ const faqs: ToolFaq[] = [
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/image-background-remover" },
-  title: "Remove Image Background Free Online | Transparent PNG Maker Offline | Passport Photo White Background",
+  title: "Remove Image Background | Transparent PNG",
   description,
 };
 

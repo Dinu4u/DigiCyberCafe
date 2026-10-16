@@ -21,7 +21,7 @@ const faqs: ToolFaq[] = [
 ];
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/passport-photo-maker" },
-  title: "Free Passport Size Photo Maker Online | Crop, Adjust & Compress to Target KB",
+  title: "Free Passport Photo Maker and Resizer",
   description,
 };
 

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: "DigiCyberCafe | In-Browser Document, PDF & Photo Tools",
-    template: "%s | DigiCyberCafe - Aapka Digital Cyber Café & Document Hub",
+    template: "%s | DigiCyberCafe",
   },
   description:
     "Free digital cyber café for exam forms, office files, and daily documents. Resize photos for upload limits, add exam photo details, edit and sign PDFs, and use browser-based tools with local processing where supported.",

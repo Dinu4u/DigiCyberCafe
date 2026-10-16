@@ -22,7 +22,7 @@ const faqs: ToolFaq[] = [
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/target-kb-file-resizer" },
-  title: "Strict KB Target File Resizer for Images & PDFs",
+  title: "Image and PDF Resizer to Target KB",
   description,
 };
 

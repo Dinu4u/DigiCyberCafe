@@ -4,7 +4,7 @@ import { PptxToPdfTool } from "@/components/tools/pdf/PptxToPdfTool";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/ppt-to-pdf" },
-  title: "Convert PowerPoint to PDF Online | PPTX to PDF",
+  title: "PowerPoint to PDF Converter | PPTX",
   description: "Convert PowerPoint PPTX presentations to PDF in your browser. Slides are rendered locally and exported one slide per PDF page.",
 };
 

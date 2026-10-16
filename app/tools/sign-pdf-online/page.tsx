@@ -4,7 +4,7 @@ import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/sign-pdf-online" },
-  title: "Sign PDF Online Free | Add an Electronic Signature",
+  title: "Sign PDF Online | Add a Signature",
   description: "Draw a signature on a PDF, type your name, or upload an ink signature. Place it on a PDF page and download locally.",
 };
 

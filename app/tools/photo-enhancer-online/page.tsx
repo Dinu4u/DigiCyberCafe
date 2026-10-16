@@ -5,7 +5,7 @@ import { PhotoEnhancer } from "@/components/tools/PhotoEnhancer";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/photo-enhancer-online" },
-  title: "AI Photo Enhancer Online Free - Unblur & Sharpen Images",
+  title: "Free AI Photo Enhancer | Sharpen and Upscale",
   description: "1-Click Image Quality Improver (Private & Offline). Enhance, sharpen, and upscale photos in your browser without uploading them.",
 };
 

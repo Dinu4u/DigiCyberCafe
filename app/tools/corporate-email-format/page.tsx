@@ -5,7 +5,7 @@ import { CorporateEmailGenerator } from "@/components/tools/CorporateEmailGenera
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/corporate-email-format" },
-  title: "Corporate Email Format Generator | OOO, Leave & Resignation",
+  title: "Corporate Email Template Generator",
   description: "Create professional out-of-office replies, leave applications, resignation notices, and appraisal requests with editable corporate email formats.",
 };
 

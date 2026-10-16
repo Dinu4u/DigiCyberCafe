@@ -8,7 +8,7 @@ import ToolContentSection from "@/components/seo/ToolContentSection";
 import type { ToolFaq, ToolHowToStep } from "@/types/advertising";
 
 const title =
-  "Sarkari Exam Age Calculator Online | Hindu Panchang & Gregorian DOB";
+  "Sarkari Exam Age Calculator";
 const description =
   "Calculate exact exam age from Gregorian or Hindu lunar birth dates. Convert Vikram Samvat, Purnimanta month, paksha and tithi to a Gregorian date using birth city and optional birth time.";
 

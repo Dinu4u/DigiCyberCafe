@@ -8,7 +8,7 @@ import JsonLdSchema from "@/components/seo/JsonLdSchema";
 import ToolContentSection from "@/components/seo/ToolContentSection";
 import type { ToolFaq, ToolHowToStep } from "@/types/advertising";
 
-const title = "Mutual Fund SIP + Lumpsum Calculator | Hybrid Top-up & Wealth Projection";
+const title = "SIP and Lumpsum Mutual Fund Calculator";
 const description =
   "Calculate mutual fund returns for SIP, one-time lumpsum, and hybrid monthly SIP with periodic lumpsum top-up (quarterly, half-yearly, yearly). Free, private & instant.";
 

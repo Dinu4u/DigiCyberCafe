@@ -4,9 +4,9 @@ import { DownloaderFaq } from "@/components/tools/media/DownloaderFaq";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/universal-media-downloader" },
-  title: "Free Video & Audio Downloader Online | MP4, MP3 & Reels Extractor",
+  title: "Video and Audio Downloader | MP4, MP3",
   description:
-    "Download high quality videos, reels, and audio in MP4, WebM, and MP3 formats for free. Fast link-to-file extractor with multiple quality options.",
+    "Download supported public video and audio links in available formats such as MP4, WebM, and MP3. Formats and quality depend on the source; only download media you have permission to save.",
 };
 
 const webApplicationSchema = {
