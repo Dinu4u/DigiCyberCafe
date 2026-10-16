@@ -7,7 +7,7 @@ type AnalyticsChoice = "accepted" | "rejected";
 type TrackingState = "idle" | "loading" | "ready" | "error";
 
 const CONSENT_STORAGE_KEY = "ecybercafe.analytics-consent.v1";
-const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
+const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-RJPXQHF432";
 const hasValidMeasurementId = /^G-[A-Z0-9]+$/i.test(measurementId);
 
 declare global {
