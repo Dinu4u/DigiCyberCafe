@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfOperationsTool } from "@/components/tools/pdf/PdfOperationsTool";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/split-pdf-pages" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function SplitPdfPagesPage() {
-  return <PdfToolShell><PdfOperationsTool mode="split" /></PdfToolShell>;
+  return <PdfToolShell><PdfOperationsTool mode="split" /><CanonicalToolAeoContent slug="split-pdf-pages" /></PdfToolShell>;
 }

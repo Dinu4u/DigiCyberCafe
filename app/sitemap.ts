@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/seo/site";
 
-const siteUrl = "https://ecybercafe.in";
 const tools = [
   "/tools/barcode-qr-generator",
   "/tools/compress-pdf-to-target-kb",
@@ -32,11 +32,11 @@ const tools = [
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    { url: siteUrl },
-    { url: `${siteUrl}/builder/biodata` },
+    { url: SITE_URL },
+    { url: `${SITE_URL}/builder/biodata` },
     ...["/about-us", "/contact-us", "/privacy-policy", "/terms-of-service"].map((path) => ({
-      url: `${siteUrl}${path}`,
+      url: `${SITE_URL}${path}`,
     })),
-    ...tools.map((path) => ({ url: `${siteUrl}${path}` })),
+    ...tools.map((path) => ({ url: `${SITE_URL}${path}` })),
   ];
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfConverterTool } from "@/components/tools/pdf/PdfConverterTool";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/word-excel-to-pdf" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function WordExcelToPdfPage() {
-  return <PdfToolShell><PdfConverterTool mode="office" /></PdfToolShell>;
+  return <PdfToolShell><PdfConverterTool mode="office" /><CanonicalToolAeoContent slug="word-excel-to-pdf" /></PdfToolShell>;
 }

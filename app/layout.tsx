@@ -8,11 +8,10 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { AD_CONFIG } from "@/config/adPolicy";
 import { AnalyticsConsent } from "@/components/analytics/AnalyticsConsent";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
-const siteUrl = "https://ecybercafe.in";
+import { SITE_URL } from "@/lib/seo/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "DigiCyberCafe | In-Browser Document, PDF & Photo Tools",
     template: "%s | DigiCyberCafe",
@@ -40,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "DigiCyberCafe",
-    url: siteUrl,
+    url: SITE_URL,
     title: "DigiCyberCafe | In-Browser Document, PDF & Photo Tools",
     description:
       "Free document, PDF, photo, and exam tools with local processing where supported.",
@@ -65,6 +64,13 @@ export const metadata: Metadata = {
   applicationName: "DigiCyberCafe",
   creator: "Dinesh Kumar",
   publisher: "Dinesh Kumar",
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
   other: {
     "contact:email": AD_CONFIG.PUBLISHER_INFO.EMAIL,
     "geo.region": "IN",

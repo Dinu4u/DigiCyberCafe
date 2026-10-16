@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfToolsHub } from "@/components/tools/pdf/PdfToolsHub";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   title: "PDF Tools: Merge, Split and Compress",
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function PdfPage() {
-  return <PdfToolShell isHub><PdfToolsHub /></PdfToolShell>;
+  return <PdfToolShell isHub><PdfToolsHub /><CanonicalToolAeoContent slug="pdf" /></PdfToolShell>;
 }

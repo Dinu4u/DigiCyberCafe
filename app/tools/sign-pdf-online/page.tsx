@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SignPdfViewer } from "@/components/tools/pdf/SignPdfViewer";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/sign-pdf-online" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function SignPdfOnlinePage() {
-  return <PdfToolShell><SignPdfViewer /></PdfToolShell>;
+  return <PdfToolShell><SignPdfViewer /><CanonicalToolAeoContent slug="sign-pdf-online" /></PdfToolShell>;
 }

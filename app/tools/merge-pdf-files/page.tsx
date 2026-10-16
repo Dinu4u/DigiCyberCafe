@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfOperationsTool } from "@/components/tools/pdf/PdfOperationsTool";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/merge-pdf-files" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function MergePdfFilesPage() {
-  return <PdfToolShell><PdfOperationsTool mode="merge" /></PdfToolShell>;
+  return <PdfToolShell><PdfOperationsTool mode="merge" /><CanonicalToolAeoContent slug="merge-pdf-files" /></PdfToolShell>;
 }

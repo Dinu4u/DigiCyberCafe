@@ -1,7 +1,44 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 
 type Context = { params: Promise<{ id: string }> };
-export async function GET(_: Request, context: Context) { return NextResponse.json(await prisma.document.findUniqueOrThrow({ where: { id: (await context.params).id } })); }
-export async function PATCH(request: Request, context: Context) { const id = (await context.params).id; const body = await request.json(); const document = await prisma.document.update({ where: { id }, data: { title: body.title, templateId: body.templateId, accentColor: body.accentColor, language: body.language, content: body.content } }); return NextResponse.json(document); }
-export async function DELETE(_: Request, context: Context) { await prisma.document.delete({ where: { id: (await context.params).id } }); return new Response(null, { status: 204 }); }
+
+export async function GET(_: Request, context: Context) {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
+  const document = await prisma.document.findFirst({ where: { id: (await context.params).id, userId } });
+  if (!document) return NextResponse.json({ error: "Document not found" }, { status: 404 });
+  return NextResponse.json(document);
+}
+
+export async function PATCH(request: Request, context: Context) {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
+  const id = (await context.params).id;
+  const body = await request.json();
+  const result = await prisma.document.updateMany({
+    where: { id, userId },
+    data: { title: body.title, templateId: body.templateId, accentColor: body.accentColor, language: body.language, content: body.content },
+  });
+  if (result.count === 0) return NextResponse.json({ error: "Document not found" }, { status: 404 });
+
+  const document = await prisma.document.findFirst({ where: { id, userId } });
+  if (!document) return NextResponse.json({ error: "Document not found" }, { status: 404 });
+  return NextResponse.json(document);
+}
+
+export async function DELETE(_: Request, context: Context) {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
+  const result = await prisma.document.deleteMany({ where: { id: (await context.params).id, userId } });
+  if (result.count === 0) return NextResponse.json({ error: "Document not found" }, { status: 404 });
+  return new Response(null, { status: 204 });
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfConverterTool } from "@/components/tools/pdf/PdfConverterTool";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/text-to-pdf-converter" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function TextToPdfConverterPage() {
-  return <PdfToolShell><PdfConverterTool mode="text" /></PdfToolShell>;
+  return <PdfToolShell><PdfConverterTool mode="text" /><CanonicalToolAeoContent slug="text-to-pdf-converter" /></PdfToolShell>;
 }

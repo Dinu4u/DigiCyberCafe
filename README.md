@@ -52,3 +52,10 @@ Measurement ID (`G-...`) in the local environment or Vercel project settings,
 then redeploy. Google Analytics loads only after a visitor accepts analytics;
 visitors can reject or revise their choice using **Analytics settings** in the
 footer. No Measurement ID means GA4 stays inactive.
+
+### Google Search Console
+
+Set `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` to the verification token provided by
+Google Search Console, then deploy the site. The token is emitted through
+Next.js metadata only when configured. Verify the `https://www.digicybercafe.online`
+property in Search Console; do not use a placeholder token.

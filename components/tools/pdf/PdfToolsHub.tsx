@@ -16,5 +16,5 @@ const tools = [
 ];
 
 export function PdfToolsHub() {
-  return <section className="pdf-hub"><p className="eyebrow">PDF WORKSPACE</p><h1>Make your PDFs<br /><em>more useful.</em></h1><p>Private browser tools for everyday document work.</p><div className="pdf-tool-grid">{tools.map(({ href, title, description, icon: Icon, tone }) => <Link className="pdf-tool-card" href={href} key={href}><span className={`pdf-tool-icon ${tone}`}><Icon size={22} /></span><strong>{title}</strong><span>{description}</span></Link>)}</div></section>;
+  return <section className="pdf-hub"><p className="eyebrow">PDF WORKSPACE</p><h1>Make your PDFs<br /><em>more useful.</em></h1><p>PDF tools for everyday document work; processing details vary by operation.</p><div className="pdf-tool-grid">{tools.map(({ href, title, description, icon: Icon, tone }) => <Link className="pdf-tool-card" href={href} key={href}><span className={`pdf-tool-icon ${tone}`}><Icon size={22} /></span><strong>{title}</strong><span>{description}</span></Link>)}</div></section>;
 }

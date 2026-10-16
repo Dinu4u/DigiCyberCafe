@@ -88,7 +88,7 @@ export default function OpenGraphImage() {
           </div>
         </div>
         <div style={{ color: "#e0e9da", fontSize: 18 }}>
-          Browser-first tools · ecybercafe.in
+          Browser-first tools · www.digicybercafe.online
         </div>
       </div>
     ),

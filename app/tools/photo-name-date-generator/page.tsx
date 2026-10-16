@@ -24,7 +24,8 @@ const faqs: ToolFaq[] = [
   { question: "Can I create an SSC or UPSC photo with name and date?", answer: "The tool can add a candidate name and date strip. Confirm the exact content, placement, date format, dimensions, and size against the current exam notice." },
   { question: "What does DOP or DOPO mean?", answer: "It refers to the date of photograph or date of photo. Exam authorities may specify different wording or formatting." },
   { question: "Does a 50 KB output guarantee exam acceptance?", answer: "No. Each recruitment authority sets its own photo size, dimensions, date, and appearance rules. Check the official application instructions." },
-  { question: "Is my photograph uploaded?", answer: "Photo editing runs in the browser for this tool; the chosen image is not sent to an exam authority." },
+  { question: "Why might an exam portal reject my photo?", answer: "The file size, dimensions, background, framing, name/date text, or format may not match the current notification. Check the official requirements and verify the downloaded file before uploading." },
+  { question: "Is my photo stored on a remote server?", answer: "For this tool, photo rendering and export run in your browser. The selected photo is not uploaded by this photo-editing workflow." },
 ];
 
 export default function PhotoNameDateGeneratorPage() {
@@ -46,16 +47,19 @@ export default function PhotoNameDateGeneratorPage() {
         <p>For exam uploads that require a date of photograph (DOP/DOPO), check the official notification for the exact label, date format, image dimensions, and file-size ceiling. The exam authority&apos;s current instructions always take precedence.</p>
       </section>
       <ToolContentSection
-        title="Sarkari exam photo with date and target KB"
-        introduction="Prepare an exam-photo layout and export for upload. The exam authority's current photo, name, date, dimension, and file-size instructions take precedence over any general preset."
+        title="Prepare an exam photo with name and date"
+        introduction="The SSC/UPSC preset renders a 413 × 531 px photo canvas and can add a candidate name and date strip; use the exam notification to confirm required dimensions, file size, format, and date text before submission."
         steps={steps}
         specifications={[
-          { label: "Photo", value: "Recent, clear image with the framing and background specified by the exam." },
+          { label: "SSC/UPSC preset", value: "413 × 531 px canvas (displayed as 3.5 × 4.5 cm in the tool); this is a preset, not a universal exam rule." },
+          { label: "Other preset", value: "Passport preset: 600 × 600 px; custom width and height are also available." },
+          { label: "Input formats", value: "JPG/JPEG, PNG, or WebP image; input files above 25 MB are rejected." },
+          { label: "Output", value: "JPEG, PNG, or WebP; file-size target is optional and the tool reports if it cannot be reached." },
+          { label: "Photo and text", value: "A recent photo can be combined with a candidate name and date; verify the receiving exam's current rules." },
           { label: "Name and date", value: "Enter the exact candidate name and date format required by the notification." },
-          { label: "Target size", value: "Choose the notification's file-size ceiling; common limits differ by exam." },
           { label: "Acceptance", value: "Always check the current official form requirements before upload." },
         ]}
-        privacy="The photo layout is processed in the browser. Do not use a generated result unless it matches the receiving authority's instructions."
+        privacy="This tool renders the photo and name/date strip using a browser canvas, and runs target-size compression in a browser worker where available. Its selected photo is not uploaded by this workflow. Other site features may use servers; see the Privacy Policy."
         faqs={faqs}
       />
     </main>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CodeGeneratorSuite } from "@/components/tools/CodeGeneratorSuite";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/barcode-qr-generator" },
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function BarcodeQrGeneratorPage() {
-  return <main className="tool-shell"><header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header><CodeGeneratorSuite /></main>;
+  return <main className="tool-shell"><header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header><CodeGeneratorSuite /><CanonicalToolAeoContent slug="barcode-qr-generator" /></main>;
 }

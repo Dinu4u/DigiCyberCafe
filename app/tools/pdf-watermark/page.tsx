@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PdfWatermarkTool } from "@/components/pdf-watermark-tool";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   title: "Add a Text Watermark to a PDF Online",
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function PdfWatermarkPage() {
-  return <PdfWatermarkTool />;
+  return <><PdfWatermarkTool /><CanonicalToolAeoContent slug="pdf-watermark" /></>;
 }

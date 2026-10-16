@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { StandardPdfCompressor } from "@/components/tools/pdf/StandardPdfCompressor";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   title: "Compress PDF Online | Reduce File Size",
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function PdfCompressPage() {
-  return <PdfToolShell><StandardPdfCompressor /></PdfToolShell>;
+  return <PdfToolShell><StandardPdfCompressor /><CanonicalToolAeoContent slug="pdf-compress" /></PdfToolShell>;
 }

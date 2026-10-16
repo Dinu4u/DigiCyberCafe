@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CorporateEmailGenerator } from "@/components/tools/CorporateEmailGenerator";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/corporate-email-format" },
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function CorporateEmailFormatPage() {
-  return <main className="tool-shell"><header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header><CorporateEmailGenerator /></main>;
+  return <main className="tool-shell"><header className="builder-topbar"><Link className="back-link" href="/#tools"><ArrowLeft size={17} /> All tools</Link></header><CorporateEmailGenerator /><CanonicalToolAeoContent slug="corporate-email-format" /></main>;
 }

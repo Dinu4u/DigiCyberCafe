@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfTranslatorTool } from "@/components/tools/pdf/PdfTranslatorTool";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/translate-pdf-document" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function TranslatePdfDocumentPage() {
-  return <PdfToolShell><PdfTranslatorTool /></PdfToolShell>;
+  return <PdfToolShell><PdfTranslatorTool /><CanonicalToolAeoContent slug="translate-pdf-document" /></PdfToolShell>;
 }

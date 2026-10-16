@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfConverterTool } from "@/components/tools/pdf/PdfConverterTool";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/image-to-pdf-converter" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function ImageToPdfConverterPage() {
-  return <PdfToolShell><PdfConverterTool mode="image" /></PdfToolShell>;
+  return <PdfToolShell><PdfConverterTool mode="image" /><CanonicalToolAeoContent slug="image-to-pdf-converter" /></PdfToolShell>;
 }

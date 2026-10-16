@@ -1,0 +1,30 @@
+# DigiCyberCafe
+> DigiCyberCafe offers online tools for exam-photo preparation, PDF tasks, biodata creation, invoicing, and other everyday document needs. Processing and data handling vary by tool; see each tool page and the Privacy Policy for details.
+
+## Core capabilities
+- Resize supported images and PDFs toward a user-selected file-size target in the browser; whether a target can be reached depends on the source file and settings.
+- Prepare exam photos with a candidate name and date strip, using configurable dimensions and output options.
+- Create passport and visa photo crops using selectable presets or custom dimensions.
+- Merge, split, compress, edit, watermark, sign, and convert supported PDF and office documents.
+- Build marriage biodata documents and create invoices or quotations with tax fields and optional UPI QR codes.
+
+## Primary endpoints
+- [Exam photo with name and date](https://www.digicybercafe.online/tools/photo-name-date-generator): Prepare a photo with candidate name/date text, select the SSC/UPSC preset (413 × 531 px), and choose optional output settings. Supported image input and export formats are listed in the tool.
+- [Target KB file resizer](https://www.digicybercafe.online/tools/target-kb-file-resizer): Resize supported JPEG, PNG, WebP, and PDF files toward a selected KB target; the browser reports whether it met the requested size.
+- [Passport photo maker](https://www.digicybercafe.online/tools/passport-photo-maker): Crop and adjust a photo using India, US/Visa/Schengen, Europe/UK/Australia, or custom dimension presets. Verify current destination requirements before use.
+- [PDF workspace](https://www.digicybercafe.online/tools/pdf): Browse PDF conversion, merging, splitting, compression, editing, signing, and watermarking tools.
+- [Marriage biodata maker](https://www.digicybercafe.online/builder/biodata): Create and export a marriage biodata profile.
+- [Invoice and quotation generator](https://www.digicybercafe.online/tools/free-invoice-generator): Prepare quotations, invoices, and related business documents with optional tax and UPI QR details.
+- [Barcode and QR code generator](https://www.digicybercafe.online/tools/barcode-qr-generator): Generate supported barcode and QR code formats.
+
+## Privacy and processing
+- Processing differs between features. Many file-editing workflows run in the browser; account storage, media extraction, translation, and other external-service features may send information to servers or third parties.
+- Read the processing and privacy notes on the specific tool page and the [Privacy Policy](https://www.digicybercafe.online/privacy-policy).
+- Publisher/operator: Dinesh Kumar, Patna, Bihar 800024, India.
+- Contact: ecybercafe.official@gmail.com
+
+## Site information
+- [About DigiCyberCafe](https://www.digicybercafe.online/about-us)
+- [Contact](https://www.digicybercafe.online/contact-us)
+- [Privacy Policy](https://www.digicybercafe.online/privacy-policy)
+- [Terms of Service](https://www.digicybercafe.online/terms-of-service)

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { TargetKbPdfCompressor } from "@/components/tools/pdf/TargetKbPdfCompressor";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/compress-pdf-to-target-kb" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function CompressPdfToTargetKbPage() {
-  return <PdfToolShell><TargetKbPdfCompressor /></PdfToolShell>;
+  return <PdfToolShell><TargetKbPdfCompressor /><CanonicalToolAeoContent slug="compress-pdf-to-target-kb" /></PdfToolShell>;
 }

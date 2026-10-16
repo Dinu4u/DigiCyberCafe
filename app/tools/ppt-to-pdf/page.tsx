@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PdfToolShell } from "@/components/tools/pdf/PdfToolShell";
 import { PptxToPdfTool } from "@/components/tools/pdf/PptxToPdfTool";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/ppt-to-pdf" },
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function PptToPdfPage() {
-  return <PdfToolShell><PptxToPdfTool /></PdfToolShell>;
+  return <PdfToolShell><PptxToPdfTool /><CanonicalToolAeoContent slug="ppt-to-pdf" /></PdfToolShell>;
 }

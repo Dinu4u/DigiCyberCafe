@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PdfWorkspace } from "@/components/pdf-workspace";
+import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
 
 export const metadata: Metadata = {
   title: "Edit PDF Online: Add Text or Cover Content",
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function PdfEditorPage() {
-  return <PdfWorkspace mode="edit" />;
+  return <><PdfWorkspace mode="edit" /><CanonicalToolAeoContent slug="pdf-editor" /></>;
 }
