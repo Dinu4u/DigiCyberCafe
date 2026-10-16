@@ -64,13 +64,9 @@ export const metadata: Metadata = {
   applicationName: "DigiCyberCafe",
   creator: "Dinesh Kumar",
   publisher: "Dinesh Kumar",
-  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
-    ? {
-        verification: {
-          google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-        },
-      }
-    : {}),
+  verification: {
+    google: "_8KUpNLMHOqWyID-GPjsqutHfBNVKI46QOwbIPaRJhc",
+  },
   other: {
     "contact:email": AD_CONFIG.PUBLISHER_INFO.EMAIL,
     "geo.region": "IN",
