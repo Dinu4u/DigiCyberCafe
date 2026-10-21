@@ -32,6 +32,7 @@ const tools = [
   "/tools/text-to-pdf-converter",
   "/tools/translate-pdf-document",
   "/tools/universal-media-downloader",
+  "/tools/video-compressor-reduce-size",
   "/tools/word-excel-to-pdf",
 ];
 

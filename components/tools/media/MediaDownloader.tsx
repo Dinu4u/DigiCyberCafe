@@ -236,6 +236,11 @@ export function MediaDownloader() {
                 <h2>Available formats</h2>
                 <span>{result.formats.length} options</span>
               </div>
+              {result.directLink && (
+                <p className={styles.noFormats}>
+                  This is a direct media link. Download behavior depends on the file host; it may open in a new browser tab instead of downloading.
+                </p>
+              )}
               <div className={styles.filterTabs} role="tablist" aria-label="Filter formats">
                 {filters.map((item) => (
                   <button

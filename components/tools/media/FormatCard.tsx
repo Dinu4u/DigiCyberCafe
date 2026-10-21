@@ -14,7 +14,11 @@ export function FormatCard({ format }: FormatCardProps) {
 
   function startDownload() {
     setStarted(true);
-    window.location.assign(format.downloadUrl);
+    if (/^https?:\/\//i.test(format.downloadUrl)) {
+      window.open(format.downloadUrl, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.assign(format.downloadUrl);
+    }
     window.setTimeout(() => setStarted(false), 4000);
   }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildMediaFormats, getMediaErrorDetails, getYtDlpImageFormats, MediaProviderError, runYtDlp, type YtDlpInfo } from "@/lib/media/ytdlp";
 import { validateMediaUrl } from "@/lib/utils/urlValidator";
-import type { MediaExtractionRequest } from "@/types/mediaDownloader";
+import type { MediaExtractionRequest, MediaFormat } from "@/types/mediaDownloader";
 
 export const runtime = "nodejs";
 
@@ -22,10 +22,41 @@ export async function POST(request: Request) {
       return NextResponse.json(getMediaErrorDetails("invalid_url"), { status: 400 });
     }
 
+    if (validated.platform === "other") {
+      const directFormat = getDirectMediaFormat(validated.url);
+      if (!directFormat) {
+        return NextResponse.json(getMediaErrorDetails("invalid_url"), { status: 400 });
+      }
+      const mediaType = directFormat.formatType === "image"
+        ? "image"
+        : directFormat.formatType === "audio-only"
+          ? "audio"
+          : "video";
+      const fileName = validated.url.pathname.split("/").pop() || "media file";
+      return NextResponse.json(
+        {
+          title: fileName,
+          mediaType,
+          sourcePlatform: "other",
+          thumbnailUrl: "",
+          formats: [directFormat],
+          directLink: true,
+        },
+        {
+          headers: {
+            "Cache-Control": "private, max-age=300",
+            "X-Content-Type-Options": "nosniff",
+          },
+        },
+      );
+    }
+
+    const playlistArgs = validated.platform === "youtube"
+      ? ["--no-playlist"]
+      : ["--playlist-end", "12"];
     const rawInfo = await runYtDlp([
       "--dump-single-json",
-      "--playlist-end",
-      "12",
+      ...playlistArgs,
       "--no-warnings",
       "--skip-download",
       "--socket-timeout",
@@ -77,6 +108,28 @@ export async function POST(request: Request) {
       status: code === "extractor_unavailable" ? 503 : code === "temporary_failure" ? 429 : 422,
     });
   }
+}
+
+function getDirectMediaFormat(url: URL): MediaFormat | undefined {
+  const extension = url.pathname.split(".").at(-1)?.toLowerCase();
+  const formats: Record<string, Pick<MediaFormat, "extension" | "formatType" | "qualityLabel">> = {
+    mp4: { extension: "mp4", formatType: "video-with-audio", qualityLabel: "Direct video file" },
+    webm: { extension: "webm", formatType: "video-with-audio", qualityLabel: "Direct video file" },
+    mp3: { extension: "mp3", formatType: "audio-only", qualityLabel: "Direct audio file" },
+    m4a: { extension: "m4a", formatType: "audio-only", qualityLabel: "Direct audio file" },
+    jpg: { extension: "jpg", formatType: "image", qualityLabel: "Direct image file" },
+    jpeg: { extension: "jpg", formatType: "image", qualityLabel: "Direct image file" },
+    png: { extension: "png", formatType: "image", qualityLabel: "Direct image file" },
+  };
+  const format = extension ? formats[extension] : undefined;
+  if (!format) return undefined;
+
+  return {
+    id: `direct-${format.extension}`,
+    ...format,
+    downloadUrl: url.toString(),
+    needsRemuxing: false,
+  };
 }
 
 function formatDuration(totalSeconds: number): string {

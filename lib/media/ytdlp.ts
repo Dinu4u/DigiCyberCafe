@@ -67,14 +67,14 @@ const ERROR_MESSAGES: Record<
   { error: string; nextStep: string }
 > = {
   private_or_restricted: {
-    error: "This content is from a private account or requires authentication.",
+    error: "This media is private, age-restricted, or requires an account.",
     nextStep:
-      "Ensure the post, reel, or video is set to 'Public' on the platform. Private stories or friends-only posts cannot be downloaded.",
+      "Use media that is public and accessible without signing in. This downloader does not sign in or bypass access restrictions.",
   },
   invalid_url: {
     error: "Unrecognized or unsupported media link.",
     nextStep:
-      "Please paste a complete, valid public link directly from YouTube, Instagram, X/Twitter, TikTok, SoundCloud, or Facebook.",
+      "Paste a supported public platform link or a direct MP4, WebM, MP3, M4A, JPG, or PNG file URL.",
   },
   unavailable: {
     error: "Media no longer available or restricted by region.",
@@ -108,7 +108,7 @@ export function classifyProviderError(
   const normalized = message.toLowerCase();
 
   if (
-    /private video|private account|login required|sign in|age.restricted|members.only|subscriber.only|authentication/.test(
+    /private video|video is private|private account|login required|sign in to (?:view|watch) this video|age[- .]restricted|members[- .]only|subscriber[- .]only|requires authentication to (?:view|watch)/.test(
       normalized,
     )
   ) {
@@ -122,7 +122,7 @@ export function classifyProviderError(
     return "unavailable";
   }
   if (
-    /429|too many requests|rate.limit|captcha|challenge|temporarily unavailable|timed out|timeout/.test(
+    /429|403|5\d\d|too many requests|rate.limit|captcha|challenge|not a bot|temporarily unavailable|timed out|timeout|connection reset|connection refused|network is unreachable/.test(
       normalized,
     )
   ) {

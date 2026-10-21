@@ -1,5 +1,15 @@
 import type { MediaSourcePlatform } from "@/types/mediaDownloader";
 
+const directMediaExtensions = new Set([
+  "mp4",
+  "webm",
+  "mp3",
+  "m4a",
+  "jpg",
+  "jpeg",
+  "png",
+]);
+
 const platformHosts: Record<Exclude<MediaSourcePlatform, "other">, string[]> = {
   youtube: ["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"],
   instagram: ["instagram.com", "www.instagram.com"],
@@ -20,7 +30,7 @@ const platformHosts: Record<Exclude<MediaSourcePlatform, "other">, string[]> = {
 };
 
 export type MediaUrlValidation =
-  | { valid: true; url: URL; platform: Exclude<MediaSourcePlatform, "other"> }
+  | { valid: true; url: URL; platform: MediaSourcePlatform }
   | { valid: false };
 
 export function validateMediaUrl(value: string): MediaUrlValidation {
@@ -51,6 +61,11 @@ export function validateMediaUrl(value: string): MediaUrlValidation {
     if (hosts.includes(hostname)) {
       return { valid: true, url, platform };
     }
+  }
+
+  const extension = url.pathname.split(".").at(-1)?.toLowerCase();
+  if (extension && directMediaExtensions.has(extension)) {
+    return { valid: true, url, platform: "other" };
   }
 
   return { valid: false };

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     let selectedFormat = buildYtDlpFormatSelector(format);
     let imagePlaylistIndex = 0;
 
-    if (!validated.valid || !selectedFormat) {
+    if (!validated.valid || validated.platform === "other" || !selectedFormat) {
       return NextResponse.json(getMediaErrorDetails("invalid_url"), { status: 400 });
     }
 

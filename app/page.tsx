@@ -17,6 +17,7 @@ import {
   Search,
   Sparkles,
   X,
+  Video,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { emailTemplates } from "@/lib/constants/emailTemplates";
@@ -43,6 +44,13 @@ const tools = [
     icon: ArrowUpRight,
     color: "green",
     href: "/tools/universal-media-downloader",
+  },
+  {
+    title: "Video Compressor",
+    description: "Compress videos privately in your browser and check the exact size reduction.",
+    icon: Video,
+    color: "blue",
+    href: "/tools/video-compressor-reduce-size",
   },
   {
     title: "Passport Size Photo Maker",
@@ -134,6 +142,7 @@ const quickTools = [
   { label: "PDF merge", hindi: "पीडीएफ मर्ज", icon: FileText, href: "/tools/merge-pdf-files" },
   { label: "PDF split", hindi: "पीडीएफ स्प्लिट", icon: FileText, href: "/tools/split-pdf-pages" },
   { label: "Downloader", hindi: "मीडिया डाउनलोडर", icon: ArrowUpRight, href: "/tools/universal-media-downloader" },
+  { label: "Video compressor", hindi: "वीडियो कंप्रेसर", icon: Video, href: "/tools/video-compressor-reduce-size" },
   { label: "PDF compressor", hindi: "पीडीएफ कंप्रेसर", icon: FileText, href: "/tools/compress-pdf-to-target-kb" },
   { label: "Sign PDF", hindi: "पीडीएफ पर हस्ताक्षर करें", icon: FileText, href: "/tools/sign-pdf-online" },
   { label: "Marriage Bio Data", hindi: "विवाह बायोडाटा", icon: Heart, href: "/builder/biodata" },
@@ -160,6 +169,7 @@ const searchItems: SearchItem[] = [
   { title: "Barcode & QR codes", hindi: "बारकोड और क्यूआर कोड", description: "Generate QR codes and barcodes in your browser.", href: "/tools/barcode-qr-generator", icon: QrCode, keywords: "scan barcode qr code ean upc code128" },
   { title: "PDF tools", hindi: "पीडीएफ टूल्स", description: "Open the PDF workspace for conversion, editing, and compression.", href: "/tools/pdf", icon: FileText, keywords: "document files tools" },
   { title: "Media downloader", hindi: "मीडिया डाउनलोडर", description: "Download public video and audio in available formats.", href: "/tools/universal-media-downloader", icon: ArrowUpRight, keywords: "video audio URL media quick tools" },
+  { title: "Video Compressor", hindi: "वीडियो कंप्रेसर", description: "Compress a video locally and check its exact output size and percentage change.", href: "/tools/video-compressor-reduce-size", icon: Video, keywords: "video reduce file size compress resize resolution scale mp4 locally private" },
   { title: "My documents", hindi: "मेरे दस्तावेज़", description: "Open your document dashboard.", href: "/dashboard", icon: FileText, keywords: "saved files recent work biodata" },
   { title: "Images to PDF", hindi: "इमेज से पीडीएफ", description: "Convert JPG, PNG, and WebP images into a PDF.", href: "/tools/image-to-pdf-converter", icon: FileText, keywords: "picture photo scan" },
   { title: "Image to PDF", hindi: "इमेज से पीडीएफ", description: "Create a PDF from image files.", href: "/tools/image-to-pdf-converter", icon: FileText, keywords: "picture photo scan" },

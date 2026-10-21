@@ -54,6 +54,7 @@ export function CodeGeneratorSuite() {
   const barcodeError = useMemo(() => validateBarcode(barcodeFormat, barcodeValue), [barcodeFormat, barcodeValue]);
   const currentValidation = mode === "qr" ? qrPayload.error : barcodeError;
   const recovery = renderError ?? (currentValidation ? recoveryFor(new Error(currentValidation), mode === "qr" ? "QR code" : barcodeLabels[barcodeFormat]) : null);
+  const qrErrorCorrection = logoData ? "H" : errorCorrection;
 
   useEffect(() => {
     let cancelled = false;
@@ -64,7 +65,7 @@ export function CodeGeneratorSuite() {
         const options = {
           width: 420,
           margin: qrMargin,
-          errorCorrectionLevel: errorCorrection,
+          errorCorrectionLevel: qrErrorCorrection,
           color: { dark: foreground, light: background },
         } as const;
         await QRCode.toCanvas(canvas, qrPayload.value, options);
@@ -80,7 +81,7 @@ export function CodeGeneratorSuite() {
       }
     })();
     return () => { cancelled = true; };
-  }, [mode, currentValidation, qrPayload, errorCorrection, qrMargin, foreground, background, logoData, retryToken]);
+  }, [mode, currentValidation, qrPayload, qrErrorCorrection, qrMargin, foreground, background, logoData, retryToken]);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +93,35 @@ export function CodeGeneratorSuite() {
         const options = { format: barcodeFormat, width: barWidth, height: barcodeHeight, displayValue: showBarcodeText, margin: 12, lineColor: foreground, background };
         JsBarcode(svg, barcodeValue, options);
         JsBarcode(canvas, barcodeValue, options);
+        if (logoData) {
+          const original = document.createElement("canvas");
+          original.width = canvas.width;
+          original.height = canvas.height;
+          const originalContext = original.getContext("2d");
+          if (!originalContext) throw new Error("This browser could not prepare the barcode preview.");
+          originalContext.drawImage(canvas, 0, 0);
+
+          const logoBandHeight = Math.max(44, Math.round(canvas.height * 0.4));
+          canvas.height += logoBandHeight;
+          const context = canvas.getContext("2d");
+          if (!context) throw new Error("This browser could not prepare the barcode preview.");
+          context.fillStyle = background;
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(original, 0, logoBandHeight);
+
+          const logoImage = await loadImage(logoData);
+          const logoSize = Math.min(canvas.width * 0.28, logoBandHeight * 0.72);
+          context.drawImage(
+            logoImage,
+            (canvas.width - logoSize) / 2,
+            (logoBandHeight - logoSize) / 2,
+            logoSize,
+            logoSize,
+          );
+          addBarcodeLogoToSvg(svg, logoData, background, logoBandHeight);
+          original.width = 0;
+          original.height = 0;
+        }
         const svgMarkup = new XMLSerializer().serializeToString(svg);
         if (cancelled) return;
         setRenderedBarcodeSvg(svgMarkup);
@@ -101,7 +131,7 @@ export function CodeGeneratorSuite() {
       }
     })();
     return () => { cancelled = true; };
-  }, [mode, barcodeFormat, barcodeValue, barcodeHeight, barWidth, showBarcodeText, foreground, background, barcodeError, retryToken]);
+  }, [mode, barcodeFormat, barcodeValue, barcodeHeight, barWidth, showBarcodeText, foreground, background, barcodeError, logoData, retryToken]);
 
   async function uploadLogo(file?: File) {
     if (!file) return;
@@ -130,7 +160,7 @@ export function CodeGeneratorSuite() {
       await QRCode.toCanvas(canvas, qrPayload.value, {
         width: 2000,
         margin: qrMargin,
-        errorCorrectionLevel: errorCorrection,
+        errorCorrectionLevel: qrErrorCorrection,
         color: { dark: foreground, light: background },
       });
       if (logoData) await drawLogoOnCanvas(canvas, logoData, background);
@@ -150,6 +180,9 @@ export function CodeGeneratorSuite() {
     const canvas = document.createElement("canvas");
     try {
       JsBarcode(source, barcodeValue, { format: barcodeFormat, width: barWidth, height: barcodeHeight, displayValue: showBarcodeText, margin: 12, lineColor: foreground, background });
+      if (logoData) {
+        addBarcodeLogoToSvg(source, logoData, background, Math.max(44, Math.round(barcodeHeight * 0.4)));
+      }
       const sourceSvg = new XMLSerializer().serializeToString(source);
       const image = await loadImage(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(sourceSvg)}`);
       const aspect = image.naturalHeight / image.naturalWidth;
@@ -242,8 +275,6 @@ export function CodeGeneratorSuite() {
             <label className={styles.field}>Error correction<select value={errorCorrection} onChange={(event) => setErrorCorrection(event.target.value as typeof errorCorrection)}><option value="L">L · 7%</option><option value="M">M · 15%</option><option value="Q">Q · 25%</option><option value="H">H · 30%</option></select></label>
             <label className={styles.field}>Quiet-zone margin <output>{qrMargin}</output><input type="range" min="0" max="10" value={qrMargin} onChange={(event) => setQrMargin(Number(event.target.value))} /></label>
           </div>
-          <label className={styles.logoUpload}><FileImage size={16} /><span>{logoData ? "Replace center logo" : "Add center logo"}<small>PNG, JPEG, or WebP · max 2 MB</small></span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void uploadLogo(event.target.files?.[0])} /></label>
-          {logoData && <button className={styles.removeLogo} onClick={() => setLogoData("")}>Remove logo</button>}
         </> : <>
           <label className={styles.field}>Symbology<select value={barcodeFormat} onChange={(event) => { setBarcodeFormat(event.target.value as BarcodeFormat); setRenderError(null); }}><option value="CODE128">Code 128</option><option value="EAN13">EAN-13</option><option value="UPC">UPC-A</option><option value="CODE39">Code 39</option></select></label>
           <label className={styles.field}>Barcode data<input value={barcodeValue} onChange={(event) => { setBarcodeValue(event.target.value); setRenderError(null); }} placeholder={barcodeFormat === "EAN13" ? "13 digits including check digit" : barcodeFormat === "UPC" ? "12 digits including check digit" : "Enter barcode data"} aria-invalid={Boolean(barcodeError)} aria-describedby={barcodeError ? "barcode-validation" : undefined} /></label>
@@ -254,6 +285,8 @@ export function CodeGeneratorSuite() {
           <label className={styles.field}>Bar width <output>{barWidth}px</output><input type="range" min="1" max="4" step="0.5" value={barWidth} onChange={(event) => setBarWidth(Number(event.target.value))} /></label>
           <label className={styles.checkbox}><input type="checkbox" checked={showBarcodeText} onChange={(event) => setShowBarcodeText(event.target.checked)} /><span>Show human-readable text</span></label>
         </>}
+        <label className={styles.logoUpload}><FileImage size={16} /><span>{logoData ? "Replace logo image" : "Add logo image"}<small>PNG, JPEG, or WebP · max 2 MB</small></span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void uploadLogo(event.target.files?.[0])} /></label>
+        {logoData && <button className={styles.removeLogo} onClick={() => setLogoData("")}>Remove logo</button>}
         {mode === "qr" && currentValidation && <p className={styles.validation} role="alert">{currentValidation}</p>}
         <div className={styles.actionRow}><button className={styles.secondaryButton} onClick={clearCurrentCode}><RotateCcw size={15} /> Clear code</button><span><Check size={14} /> Runs offline</span></div>
       </section>
@@ -376,6 +409,38 @@ async function addLogoToSvg(svg: string, logoData: string, background: string) {
   const y = (height - size) / 2;
   const logo = `<rect x="${x - size * 0.12}" y="${y - size * 0.12}" width="${size * 1.24}" height="${size * 1.24}" rx="${size * 0.12}" fill="${background}"/><image href="${logoData}" x="${x}" y="${y}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`;
   return svg.replace("</svg>", `${logo}</svg>`);
+}
+
+function addBarcodeLogoToSvg(svg: SVGSVGElement, logoData: string, background: string, bandHeight: number) {
+  const viewBox = svg.getAttribute("viewBox")?.trim().split(/[\s,]+/).map(Number);
+  const width = viewBox?.[2] ?? Number.parseFloat(svg.getAttribute("width") ?? "");
+  const height = viewBox?.[3] ?? Number.parseFloat(svg.getAttribute("height") ?? "");
+  if (!Number.isFinite(width) || !Number.isFinite(height)) throw new Error("The barcode renderer returned unsupported SVG dimensions.");
+
+  const namespace = "http://www.w3.org/2000/svg";
+  const shiftedCode = document.createElementNS(namespace, "g");
+  shiftedCode.setAttribute("transform", `translate(0 ${bandHeight})`);
+  while (svg.firstChild) shiftedCode.appendChild(svg.firstChild);
+
+  const logoBand = document.createElementNS(namespace, "rect");
+  logoBand.setAttribute("x", "0");
+  logoBand.setAttribute("y", "0");
+  logoBand.setAttribute("width", String(width));
+  logoBand.setAttribute("height", String(bandHeight));
+  logoBand.setAttribute("fill", background);
+
+  const logoSize = Math.min(width * 0.28, bandHeight * 0.72);
+  const logo = document.createElementNS(namespace, "image");
+  logo.setAttribute("href", logoData);
+  logo.setAttribute("x", String((width - logoSize) / 2));
+  logo.setAttribute("y", String((bandHeight - logoSize) / 2));
+  logo.setAttribute("width", String(logoSize));
+  logo.setAttribute("height", String(logoSize));
+  logo.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+  svg.setAttribute("viewBox", `0 0 ${width} ${height + bandHeight}`);
+  svg.setAttribute("height", `${height + bandHeight}px`);
+  svg.append(logoBand, logo, shiftedCode);
 }
 
 async function drawLogoOnCanvas(canvas: HTMLCanvasElement, logoData: string, background: string) {

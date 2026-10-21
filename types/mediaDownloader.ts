@@ -28,6 +28,7 @@ export interface MediaExtractionResponse {
   mediaType: MediaType;
   sourcePlatform: MediaSourcePlatform;
   thumbnailUrl: string;
+  directLink?: boolean;
   durationFormatted?: string;
   authorName?: string;
   formats: MediaFormat[];
