@@ -125,7 +125,7 @@ export function MediaDownloader() {
         <div className={styles.intro}>
           <p className="eyebrow">PUBLIC MEDIA DOWNLOADER</p>
           <h1>Bring the good stuff<br /><em>with you.</em></h1>
-          <p>Fetch available video and audio formats from a public link.</p>
+          <p>Fetch supported public links. Platform links are processed through our server; direct media links open from their host.</p>
         </div>
 
         <form
@@ -271,7 +271,7 @@ export function MediaDownloader() {
 
         <div className={styles.privacyNote}>
           <ShieldCheck size={16} />
-          <span>Downloads are processed securely. No personal media or search history is saved.</span>
+          <span>Platform media is temporarily stored on our server, then streamed to your browser and deleted when the transfer ends. Search history is not saved.</span>
         </div>
         <p className={styles.permissionNote}>
           Only download media you own or have permission to save. Private and restricted content is not supported.

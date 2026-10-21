@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 import type {
@@ -15,9 +16,19 @@ const YT_DLP_EXECUTABLE = resolve(
   "yt-dlp",
   process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp",
 );
+const FFMPEG_EXECUTABLE = resolve(
+  process.cwd(),
+  "node_modules",
+  "ffmpeg-static",
+  process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg",
+);
 
 export function getYtDlpExecutablePath(): string {
   return YT_DLP_EXECUTABLE;
+}
+
+export function getFfmpegExecutablePath(): string | null {
+  return existsSync(FFMPEG_EXECUTABLE) ? FFMPEG_EXECUTABLE : null;
 }
 
 export class MediaProviderError extends Error {
@@ -82,9 +93,9 @@ const ERROR_MESSAGES: Record<
       "Check if the video still plays in your browser. If it was taken down or blocked in your country, it cannot be retrieved.",
   },
   temporary_failure: {
-    error: "Temporary server congestion while contacting the media provider.",
+    error: "The media provider or network did not complete this request.",
     nextStep:
-      "Wait 15-30 seconds and click 'Fetch Media' again, or try a lower resolution format.",
+      "Wait 15-30 seconds and retry once. Providers can rate-limit or block requests; private, sign-in-required, and region-restricted media cannot be fetched.",
   },
   extractor_unavailable: {
     error: "The media fetch service could not start.",
@@ -132,7 +143,10 @@ export function classifyProviderError(
   return "extraction_failed";
 }
 
-export function runYtDlp(args: string[]): Promise<string> {
+export function runYtDlp(
+  args: string[],
+  timeoutMs = PROCESS_TIMEOUT_MS,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     let child: ReturnType<typeof spawn>;
     try {
@@ -174,7 +188,7 @@ export function runYtDlp(args: string[]): Promise<string> {
           "The media provider timed out.",
         ),
       );
-    }, PROCESS_TIMEOUT_MS);
+    }, timeoutMs);
 
     const finish = (error?: Error, output?: string) => {
       if (settled) return;
@@ -268,10 +282,14 @@ export function buildMediaFormats(
     (format) =>
       format.vcodec &&
       format.vcodec !== "none" &&
-      format.acodec &&
-      format.acodec !== "none" &&
       Number.isFinite(format.height) &&
       (format.ext === "mp4" || format.ext === "webm"),
+  );
+  const audioFormats = formats.filter(
+    (format) =>
+      format.acodec &&
+      format.acodec !== "none" &&
+      (!format.vcodec || format.vcodec === "none"),
   );
   const output: MediaFormat[] = [];
   const qualityTiers = [
@@ -279,6 +297,8 @@ export function buildMediaFormats(
     { height: 720, label: "720p (HD)" },
     { height: 480, label: "480p" },
     { height: 360, label: "360p" },
+    { height: 240, label: "240p" },
+    { height: 144, label: "144p" },
   ];
 
   for (const tier of qualityTiers) {
@@ -286,11 +306,23 @@ export function buildMediaFormats(
       const exactFormats = videoFormats.filter(
         (format) => format.height === tier.height && format.ext === extension,
       );
-      if (exactFormats.length === 0) continue;
+      const audioExtension = extension === "mp4" ? "m4a" : "webm";
+      const hasMuxedFormat = exactFormats.some(
+        (format) => format.acodec && format.acodec !== "none",
+      );
+      const hasSeparateAudio = exactFormats.some(
+        (format) => !format.acodec || format.acodec === "none",
+      ) && audioFormats.some((format) => format.ext === audioExtension);
+      if (!hasMuxedFormat && !hasSeparateAudio) continue;
 
-      const size = exactFormats
+      const videoSize = exactFormats
         .map((format) => format.filesize ?? format.filesize_approx)
         .find((value): value is number => typeof value === "number");
+      const audioSize = audioFormats
+        .filter((format) => format.ext === audioExtension)
+        .map((format) => format.filesize ?? format.filesize_approx)
+        .find((value): value is number => typeof value === "number");
+      const size = hasMuxedFormat ? videoSize : videoSize && audioSize ? videoSize + audioSize : videoSize;
       output.push(
         makeFormat(
           url,
@@ -298,19 +330,13 @@ export function buildMediaFormats(
           extension,
           "video-with-audio",
           tier.label,
-          false,
+          !hasMuxedFormat,
           approximateSizeMB(size),
         ),
       );
     }
   }
 
-  const audioFormats = formats.filter(
-    (format) =>
-      format.acodec &&
-      format.acodec !== "none" &&
-      (!format.vcodec || format.vcodec === "none"),
-  );
   if (audioFormats.length > 0) {
     const audioSize = audioFormats
       .map((format) => format.filesize ?? format.filesize_approx)
@@ -396,14 +422,15 @@ export function getYtDlpImageFormats(info: YtDlpInfo): YtDlpImageFormat[] {
 export function buildYtDlpFormatSelector(
   format: string,
 ): { selector: string; extension: string; postprocess: string[] } | undefined {
-  const match = /^video-(1080|720|480|360)-(mp4|webm)$/.exec(format);
+  const match = /^video-(1080|720|480|360|240|144)-(mp4|webm)$/.exec(format);
   if (match) {
     const height = match[1];
     const extension = match[2];
+    const audioExtension = extension === "mp4" ? "m4a" : "webm";
     return {
-      selector: `best[height=${height}][ext=${extension}][vcodec!=none][acodec!=none]/best[height<=${height}][ext=${extension}][vcodec!=none][acodec!=none]`,
+      selector: `best[height=${height}][ext=${extension}][vcodec!=none][acodec!=none]/bestvideo[height=${height}][ext=${extension}][vcodec!=none]+bestaudio[ext=${audioExtension}]`,
       extension,
-      postprocess: [],
+      postprocess: ["--merge-output-format", extension],
     };
   }
   if (format === "audio-m4a") {

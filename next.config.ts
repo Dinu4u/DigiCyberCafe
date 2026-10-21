@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   outputFileTracingIncludes: {
-    "/api/media/*": ["./node_modules/.cache/yt-dlp/**/*"],
+    "/api/media/*": ["./node_modules/.cache/yt-dlp/**/*", "./node_modules/ffmpeg-static/**/*"],
   },
   webpack: (config) => {
     config.experiments = {
