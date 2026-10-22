@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Download, FilePlus2, FileText, Gauge } from "lucide-react";
 import { PdfThumbnail } from "@/components/tools/pdf/PdfThumbnail";
+import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
 type WorkerMessage =
   | { step: "rendering" | "compressing" | "assembling"; pageCurrent: number; pageTotal: number; currentKB: number }
@@ -41,8 +42,15 @@ export function TargetKbPdfCompressor() {
   function compress() {
     if (!file) return setMessage("Choose a PDF first.");
     if (!Number.isFinite(targetKB) || targetKB < 10) return setMessage("Enter a target size of at least 10 KB.");
+    const runtimeIssue = getLocalProcessingSupportIssue({ requireWorker: true, requireOffscreenCanvas: true });
+    if (runtimeIssue) return setMessage(`This browser cannot run the local PDF processor. ${runtimeIssue}`);
     workerRef.current?.terminate();
-    const worker = new Worker(new URL("../../../lib/workers/pdfTargetCompressor.worker.ts", import.meta.url), { type: "module" });
+    let worker: Worker;
+    try {
+      worker = new Worker(new URL("../../../lib/workers/pdfTargetCompressor.worker.ts", import.meta.url), { type: "module" });
+    } catch {
+      return setMessage("The PDF compression worker could not start. Check browser restrictions or try another browser.");
+    }
     workerRef.current = worker;
     setBusy(true);
     setMessage("");

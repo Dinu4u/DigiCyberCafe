@@ -8,6 +8,7 @@ import {
   type VideoCompressorWorkerResponse,
 } from "@/types/videoCompressor";
 import { VideoMetricsCard } from "@/components/tools/video/VideoMetricsCard";
+import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
 type CompressionState = "idle" | "processing" | "complete" | "error";
 
@@ -95,6 +96,16 @@ export function VideoCompressor() {
 
   function startCompression() {
     if (!file || busy) return;
+    const runtimeIssue = getLocalProcessingSupportIssue({
+      requireWorker: true,
+      requireWebAssembly: true,
+    });
+    if (runtimeIssue) {
+      setState("error");
+      setError(`This browser cannot run the local video engine. ${runtimeIssue}`);
+      setProgress(null);
+      return;
+    }
     setState("processing");
     setProgress({ phase: "loading", progress: 0, message: "Starting the local video worker…" });
     setError("");

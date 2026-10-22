@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, Download, FlipHorizontal2, ImagePlus, Info, LoaderCircle, RotateCcw, RotateCw, SlidersHorizontal, X } from "lucide-react";
 import { PASSPORT_PRESETS, type CropRect, usePassportAdjustments } from "@/lib/hooks/usePassportAdjustments";
+import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
 type ErrorState = { title: string; message: string; steps: string[] };
 
@@ -187,6 +188,12 @@ export function PassportPhotoCreator() {
       });
     }
 
+    const runtimeIssue = getLocalProcessingSupportIssue({
+      requireWorker: true,
+      requireOffscreenCanvas: true,
+      requireImageBitmap: true,
+    });
+    if (runtimeIssue) throw new Error(runtimeIssue);
     const bitmap = await createImageBitmap(canvas);
     return new Promise<Blob>((resolve, reject) => {
       let worker: Worker;

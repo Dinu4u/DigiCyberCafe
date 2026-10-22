@@ -34,6 +34,9 @@ workerScope.onmessage = async ({ data }) => {
   };
 
   try {
+    if (typeof WebAssembly === "undefined") {
+      throw new BackgroundWorkerError("acceleration", "This browser does not support WebAssembly, which is required for the local image AI engine.");
+    }
     if (!(data?.imageBytes instanceof ArrayBuffer) || !data.mimeType.startsWith("image/")) {
       throw new BackgroundWorkerError("corrupt", "The image data could not be read. Re-upload a valid JPG, PNG, or WebP image.");
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
 export type BackgroundMode = "transparent" | "white" | "blue" | "gray" | "custom" | "image";
 export type RemovalStatus = "idle" | "downloading-model" | "processing" | "ready" | "error";
@@ -54,6 +55,20 @@ export function useBackgroundRemoval(source: File | null, backgroundMode: Backgr
     let active = true;
     const startFrame = window.requestAnimationFrame(() => {
       if (!active) return;
+      const runtimeIssue = getLocalProcessingSupportIssue({
+        requireWorker: true,
+        requireWebAssembly: true,
+        requireOffscreenCanvas: true,
+        requireImageBitmap: true,
+      });
+      if (runtimeIssue) {
+        setMaskResult(null);
+        setOutputBlob(null);
+        setError(recoveryFor("acceleration", runtimeIssue));
+        setStatus("error");
+        setProgress(null);
+        return;
+      }
       setMaskResult(null);
       setOutputBlob(null);
       setError(null);

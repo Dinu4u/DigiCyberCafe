@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowDownToLine, AlertCircle, Check, FileText, ImagePlus, LoaderCircle, ShieldCheck, X } from "lucide-react";
+import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
 type ProgressPhase = "reading" | "rendering" | "compressing" | "assembling";
 type WorkerMessage =
@@ -71,6 +72,16 @@ export function TargetSizeResizer() {
     }
     if (!Number.isFinite(targetKB) || targetKB < 1) {
       setError("Enter a target size of at least 1 KB.");
+      return;
+    }
+    const isPdfFile = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    const runtimeIssue = getLocalProcessingSupportIssue({
+      requireWorker: true,
+      requireOffscreenCanvas: true,
+      requireImageBitmap: !isPdfFile,
+    });
+    if (runtimeIssue) {
+      setError(`This browser cannot run the local file processor. ${runtimeIssue}`);
       return;
     }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
 export type ImageEnhancerSettings = {
   brightness: number;
@@ -316,6 +317,12 @@ export function useImageEnhancer() {
 
 function runEnhancerWorker(payload: WorkerPayload, onWorker?: (worker: Worker) => void): Promise<WorkerSuccess> {
   return new Promise((resolve, reject) => {
+    const runtimeIssue = getLocalProcessingSupportIssue({ requireWorker: true, requireOffscreenCanvas: true });
+    if (runtimeIssue) {
+      payload.bitmap.close();
+      reject(new EnhancerRuntimeError("unsupported", runtimeIssue));
+      return;
+    }
     let worker: Worker;
     let settled = false;
     const timeout = { id: 0 };

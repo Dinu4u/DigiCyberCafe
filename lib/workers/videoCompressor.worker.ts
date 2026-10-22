@@ -71,6 +71,9 @@ workerScope.onmessage = async ({ data }) => {
   };
 
   try {
+    if (typeof WebAssembly === "undefined" || typeof fetch !== "function") {
+      throw new Error("This browser does not support the WebAssembly runtime needed for local video compression.");
+    }
     if (!(data.file instanceof File) || data.file.size === 0) {
       throw new Error("Choose a non-empty video file to compress.");
     }

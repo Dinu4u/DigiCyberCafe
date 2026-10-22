@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, Download, FileImage, ImagePlus, LoaderCircle, RotateCcw } from "lucide-react";
 import { useExamPhotoCanvas, type ExamPhotoPreset, type PhotoCanvasError } from "@/lib/hooks/useExamPhotoCanvas";
+import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
 type OutputFormat = "image/png" | "image/jpeg" | "image/webp";
 type WorkerResult =
@@ -265,7 +266,12 @@ async function compressInWorker(
   signal: AbortSignal,
   setActiveWorker: (worker: Worker | null) => void,
 ) {
-  if (typeof Worker === "undefined" || typeof createImageBitmap !== "function") throw new Error("Web Workers or ImageBitmap are not available.");
+  const runtimeIssue = getLocalProcessingSupportIssue({
+    requireWorker: true,
+    requireOffscreenCanvas: true,
+    requireImageBitmap: true,
+  });
+  if (runtimeIssue) throw new Error(runtimeIssue);
   const bitmap = await createImageBitmap(renderedCanvas);
   return new Promise<Blob>((resolve, reject) => {
     let settled = false;
