@@ -112,6 +112,7 @@ export function MediaDownloader() {
     if (filter === "images") return format.formatType === "image";
     return true;
   });
+  const originalMediaUrl = getSafeExternalUrl(url);
 
   return (
     <main className={styles.page}>
@@ -202,6 +203,14 @@ export function MediaDownloader() {
               >
                 <RotateCcw size={14} /> Try again
               </button>
+              {originalMediaUrl && error.code !== "invalid_url" && (
+                <a className={styles.retryButton} href={originalMediaUrl} target="_blank" rel="noopener noreferrer">
+                  <Link2 size={14} /> Open original media
+                </a>
+              )}
+              {error.code === "temporary_failure" && (
+                <p>If this source keeps blocking the fetch, use its official download or export option when available.</p>
+              )}
             </div>
           </section>
         )}
@@ -279,4 +288,13 @@ export function MediaDownloader() {
       </section>
     </main>
   );
+}
+
+function getSafeExternalUrl(value: string): string | null {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
