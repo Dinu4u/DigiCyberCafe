@@ -15,7 +15,7 @@ const questions = [
   {
     question: "How do I choose video quality?",
     answer:
-      "Higher resolutions such as 1080p preserve more detail and generally use more data and storage. Choose 720p or 480p for a smaller file when that quality is available for the media.",
+      "Higher resolutions such as 1440p or 4K preserve more detail and generally use more data and storage. Choose 720p or 480p for a smaller file when that quality is available for the media.",
   },
   {
     question: "Why don't I see every quality or format?",

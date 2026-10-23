@@ -292,19 +292,24 @@ export function buildMediaFormats(
       (!format.vcodec || format.vcodec === "none"),
   );
   const output: MediaFormat[] = [];
-  const qualityTiers = [
-    { height: 1080, label: "1080p (Full HD)" },
-    { height: 720, label: "720p (HD)" },
-    { height: 480, label: "480p" },
-    { height: 360, label: "360p" },
-    { height: 240, label: "240p" },
-    { height: 144, label: "144p" },
-  ];
+  const qualityHeights = [
+    ...new Set(
+      videoFormats
+        .map((format) => format.height)
+        .filter(
+          (height): height is number =>
+            typeof height === "number" &&
+            Number.isInteger(height) &&
+            height > 0 &&
+            height <= 16_384,
+        ),
+    ),
+  ].sort((first, second) => second - first);
 
-  for (const tier of qualityTiers) {
+  for (const height of qualityHeights) {
     for (const extension of ["mp4", "webm"] as const) {
       const exactFormats = videoFormats.filter(
-        (format) => format.height === tier.height && format.ext === extension,
+        (format) => format.height === height && format.ext === extension,
       );
       const audioExtension = extension === "mp4" ? "m4a" : "webm";
       const hasMuxedFormat = exactFormats.some(
@@ -326,10 +331,10 @@ export function buildMediaFormats(
       output.push(
         makeFormat(
           url,
-          `video-${tier.height}-${extension}`,
+          `video-${height}-${extension}`,
           extension,
           "video-with-audio",
-          tier.label,
+          getVideoQualityLabel(height),
           !hasMuxedFormat,
           approximateSizeMB(size),
         ),
@@ -422,9 +427,10 @@ export function getYtDlpImageFormats(info: YtDlpInfo): YtDlpImageFormat[] {
 export function buildYtDlpFormatSelector(
   format: string,
 ): { selector: string; extension: string; postprocess: string[] } | undefined {
-  const match = /^video-(1080|720|480|360|240|144)-(mp4|webm)$/.exec(format);
-  if (match) {
-    const height = match[1];
+  const match = /^video-(\d{1,5})-(mp4|webm)$/.exec(format);
+  const heightValue = match ? Number(match[1]) : 0;
+  if (match && heightValue > 0 && heightValue <= 16_384) {
+    const height = String(heightValue);
     const extension = match[2];
     const audioExtension = extension === "mp4" ? "m4a" : "webm";
     return {
@@ -451,4 +457,15 @@ export function buildYtDlpFormatSelector(
     return { selector: "", extension: "jpg", postprocess: [] };
   }
   return undefined;
+}
+
+function getVideoQualityLabel(height: number): string {
+  const labels: Record<number, string> = {
+    4320: "4320p (8K)",
+    2160: "2160p (4K UHD)",
+    1440: "1440p (QHD)",
+    1080: "1080p (Full HD)",
+    720: "720p (HD)",
+  };
+  return labels[height] ?? `${height}p`;
 }

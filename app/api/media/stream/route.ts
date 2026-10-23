@@ -134,7 +134,12 @@ export async function GET(request: Request) {
         ? error.code
         : "extraction_failed";
     return NextResponse.json(getMediaErrorDetails(code), {
-      status: code === "temporary_failure" ? 429 : 422,
+      status:
+        code === "extractor_unavailable"
+          ? 503
+          : code === "temporary_failure"
+            ? 429
+            : 422,
     });
   }
 
