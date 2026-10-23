@@ -6,7 +6,6 @@ const tools = [
   "/tools/biodata-maker-marriage-job",
   "/tools/compress-pdf-to-target-kb",
   "/tools/corporate-email-format",
-  "/tools/downloader",
   "/tools/free-invoice-generator",
   "/tools/hra-rent-receipt-generator",
   "/tools/image-background-remover",
@@ -31,7 +30,6 @@ const tools = [
   "/tools/target-kb-file-resizer",
   "/tools/text-to-pdf-converter",
   "/tools/translate-pdf-document",
-  "/tools/universal-media-downloader",
   "/tools/video-compressor-reduce-size",
   "/tools/word-excel-to-pdf",
 ];

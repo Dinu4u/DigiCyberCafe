@@ -28,8 +28,7 @@ export default function AboutUsPage() {
           process selected files directly in your browser, so those workflows do
           not send the file to our processing server. This is not true of every
           feature. Account registration and saved documents use server-side
-          services, and the media downloader sends a supplied public URL to a
-          server-side extraction process. Each tool should be judged by its own
+          services. The media downloader is currently unavailable. Each tool should be judged by its own
           workflow; our <Link className="underline" href="/privacy-policy">Privacy Policy</Link>
           {" "}describes these distinctions.
         </p>

@@ -39,13 +39,6 @@ const tools = [
     href: "/builder/biodata",
   },
   {
-    title: "Media downloader",
-    description: "Save video and audio from the web, simply.",
-    icon: ArrowUpRight,
-    color: "green",
-    href: "/tools/universal-media-downloader",
-  },
-  {
     title: "Video Compressor",
     description: "Compress videos privately in your browser and check the exact size reduction.",
     icon: Video,
@@ -141,7 +134,6 @@ const tools = [
 const quickTools = [
   { label: "PDF merge", hindi: "पीडीएफ मर्ज", icon: FileText, href: "/tools/merge-pdf-files" },
   { label: "PDF split", hindi: "पीडीएफ स्प्लिट", icon: FileText, href: "/tools/split-pdf-pages" },
-  { label: "Downloader", hindi: "मीडिया डाउनलोडर", icon: ArrowUpRight, href: "/tools/universal-media-downloader" },
   { label: "Video compressor", hindi: "वीडियो कंप्रेसर", icon: Video, href: "/tools/video-compressor-reduce-size" },
   { label: "PDF compressor", hindi: "पीडीएफ कंप्रेसर", icon: FileText, href: "/tools/compress-pdf-to-target-kb" },
   { label: "Sign PDF", hindi: "पीडीएफ पर हस्ताक्षर करें", icon: FileText, href: "/tools/sign-pdf-online" },
@@ -168,7 +160,6 @@ const searchItems: SearchItem[] = [
   { title: "HRA Rent Receipt", hindi: "एचआरए किराया रसीद", description: "Create one or 12 printable monthly rent receipts as a PDF.", href: "/tools/hra-rent-receipt-generator", icon: Receipt, keywords: "house rent allowance HRA landlord tenant PAN receipt 1 month 12 months financial year tax exemption 10(13A) rent agreement" },
   { title: "Barcode & QR codes", hindi: "बारकोड और क्यूआर कोड", description: "Generate QR codes and barcodes in your browser.", href: "/tools/barcode-qr-generator", icon: QrCode, keywords: "scan barcode qr code ean upc code128" },
   { title: "PDF tools", hindi: "पीडीएफ टूल्स", description: "Open the PDF workspace for conversion, editing, and compression.", href: "/tools/pdf", icon: FileText, keywords: "document files tools" },
-  { title: "Media downloader", hindi: "मीडिया डाउनलोडर", description: "Download public video and audio in available formats.", href: "/tools/universal-media-downloader", icon: ArrowUpRight, keywords: "video audio URL media quick tools" },
   { title: "Video Compressor", hindi: "वीडियो कंप्रेसर", description: "Compress a video locally and check its exact output size and percentage change.", href: "/tools/video-compressor-reduce-size", icon: Video, keywords: "video reduce file size compress resize resolution scale mp4 locally private" },
   { title: "My documents", hindi: "मेरे दस्तावेज़", description: "Open your document dashboard.", href: "/dashboard", icon: FileText, keywords: "saved files recent work biodata" },
   { title: "Images to PDF", hindi: "इमेज से पीडीएफ", description: "Convert JPG, PNG, and WebP images into a PDF.", href: "/tools/image-to-pdf-converter", icon: FileText, keywords: "picture photo scan" },

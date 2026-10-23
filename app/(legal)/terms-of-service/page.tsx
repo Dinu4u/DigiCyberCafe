@@ -34,9 +34,9 @@ export default function TermsOfServicePage() {
             legality, backup, review, and final submission of content you enter,
             generate, download, or share. Do not attempt to disrupt, reverse
             engineer, abuse, or gain unauthorized access to the service or its
-            providers. Do not use the media downloader to violate copyright,
-            platform terms, privacy, or other rights; you are responsible for
-            obtaining permission and complying with applicable rules.
+            providers. You are responsible for obtaining permission to use
+            materials and complying with applicable copyright, privacy, and
+            platform rules.
           </p>
         </section>
         <section>

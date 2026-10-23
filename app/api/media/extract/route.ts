@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { buildMediaFormats, getMediaErrorDetails, getYtDlpImageFormats, MediaProviderError, runYtDlp, type YtDlpInfo } from "@/lib/media/ytdlp";
 import { validateMediaUrl } from "@/lib/utils/urlValidator";
+import { MEDIA_DOWNLOADER_ENABLED } from "@/lib/media/availability";
 import type { MediaExtractionRequest, MediaFormat } from "@/types/mediaDownloader";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  if (!MEDIA_DOWNLOADER_ENABLED) {
+    return NextResponse.json({ error: "Media downloads are temporarily unavailable." }, { status: 404 });
+  }
+
   try {
     let body: MediaExtractionRequest;
     try {

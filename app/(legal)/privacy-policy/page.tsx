@@ -32,10 +32,9 @@ export default function PrivacyPolicyPage() {
             uploaded to our file-processing server. This statement does not apply
             to every part of the service: if you register or sign in, account
             information is sent to our server; documents saved through the
-            dashboard are stored in our database; and the media downloader sends
-            a submitted media URL to a server-side service to inspect or stream
-            media. Do not submit information unless you understand the relevant
-            tool flow. Browser extensions, browser sync, and your device may also
+            dashboard are stored in our database. The media downloader is
+            currently unavailable. Do not submit information unless you
+            understand the relevant tool flow. Browser extensions, browser sync, and your device may also
             affect local data.
           </p>
           <p className="mt-2">
@@ -52,7 +51,7 @@ export default function PrivacyPolicyPage() {
           <p className="mt-2">
             Depending on the feature used, information may include account name
             and email address, password hash, content and settings of documents
-            you choose to save, a media URL you submit, and technical request
+            you choose to save, and technical request
             information such as IP address, browser details, and timestamps
             handled by the application or its hosting and security providers.
             A Hindu-calendar city lookup also discloses the city query to Open-Meteo.

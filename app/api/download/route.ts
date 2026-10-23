@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { spawn } from "node:child_process";
+import { MEDIA_DOWNLOADER_ENABLED } from "@/lib/media/availability";
 
 const allowedHosts = new Set(["youtube.com", "www.youtube.com", "youtu.be", "instagram.com", "www.instagram.com", "facebook.com", "www.facebook.com", "x.com", "www.x.com", "twitter.com", "www.twitter.com"]);
 const requests = new Map<string, number[]>();
@@ -13,6 +14,10 @@ function checkYtDlp() {
 }
 
 export async function POST(request: Request) {
+  if (!MEDIA_DOWNLOADER_ENABLED) {
+    return NextResponse.json({ error: "Media downloads are temporarily unavailable." }, { status: 404 });
+  }
+
   const ip = request.headers.get("x-forwarded-for") ?? "local";
   const now = Date.now(); const recent = (requests.get(ip) ?? []).filter((time) => now - time < 60_000);
   if (recent.length >= 5) return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });

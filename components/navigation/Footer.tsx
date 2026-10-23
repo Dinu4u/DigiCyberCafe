@@ -63,8 +63,8 @@ export function Footer() {
             </address>
             <p className="mx-auto mt-3 max-w-2xl text-xs leading-5 text-slate-500 sm:mx-0">
               Browser-based document and exam utilities. Many tools process files
-              on your device; account, saved-document, and media-downloader
-              features use our server as explained in the Privacy Policy.
+              on your device; account and saved-document features use our server
+              as explained in the Privacy Policy.
             </p>
           </div>
           <div className="flex flex-col items-center gap-3 sm:items-end">

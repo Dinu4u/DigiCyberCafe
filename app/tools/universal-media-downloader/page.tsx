@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { MediaDownloader } from "@/components/tools/media/MediaDownloader";
 import { DownloaderFaq } from "@/components/tools/media/DownloaderFaq";
 import { CanonicalToolAeoContent } from "@/components/seo/CanonicalToolAeoContent";
+import { MEDIA_DOWNLOADER_ENABLED } from "@/lib/media/availability";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/universal-media-downloader" },
@@ -11,6 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default function UniversalMediaDownloaderPage() {
+  if (!MEDIA_DOWNLOADER_ENABLED) notFound();
+
   return (
     <>
       <MediaDownloader />

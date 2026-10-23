@@ -5,10 +5,15 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildYtDlpFormatSelector, getFfmpegExecutablePath, getMediaErrorDetails, getYtDlpImageFormats, MediaProviderError, runYtDlp, type YtDlpInfo } from "@/lib/media/ytdlp";
 import { validateMediaUrl } from "@/lib/utils/urlValidator";
+import { MEDIA_DOWNLOADER_ENABLED } from "@/lib/media/availability";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
+  if (!MEDIA_DOWNLOADER_ENABLED) {
+    return NextResponse.json({ error: "Media downloads are temporarily unavailable." }, { status: 404 });
+  }
+
   try {
     const parameters = new URL(request.url).searchParams;
     const urlValue = parameters.get("url") ?? "";
@@ -142,7 +147,6 @@ export async function GET(request: Request) {
             : 422,
     });
   }
-
 }
 
 function contentType(extension: string, isAudio = false): string {
