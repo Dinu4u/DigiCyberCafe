@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { chmod, mkdir, readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,10 +17,19 @@ if (!releaseAssetName) {
 }
 
 const executablePath = join(projectRoot, "node_modules", ".cache", "yt-dlp", executableName);
+let installedVersion;
 try {
   const existing = await stat(executablePath);
   if (existing.isFile() && existing.size > 0) {
-    process.exit(0);
+    try {
+      installedVersion = execFileSync(executablePath, ["--version"], {
+        encoding: "utf8",
+        timeout: 60_000,
+        windowsHide: true,
+      }).trim();
+    } catch (error) {
+      console.warn(`Could not read the installed yt-dlp version; refreshing it. ${error.message}`);
+    }
   }
 } catch (error) {
   if (error.code !== "ENOENT") throw error;
@@ -39,47 +49,63 @@ async function fetchOk(url, accept = headers.Accept) {
 }
 
 const release = await (await fetchOk("https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest")).json();
-const binaryAsset = release.assets?.find((asset) => asset.name === releaseAssetName);
-const checksumAsset = release.assets?.find((asset) => asset.name === "SHA2-256SUMS");
-if (!binaryAsset || !checksumAsset) {
-  throw new Error(`The latest yt-dlp release is missing ${releaseAssetName} or its checksum file.`);
+if (installedVersion === release.tag_name) {
+  console.log(`yt-dlp ${installedVersion} is already current.`);
+} else {
+  await installRelease(release);
 }
 
-const [checksumResponse, binaryResponse] = await Promise.all([
-  fetchOk(checksumAsset.browser_download_url, "text/plain"),
-  fetchOk(binaryAsset.browser_download_url, "application/octet-stream"),
-]);
-const checksumText = await checksumResponse.text();
-const checksumLine = checksumText
-  .split(/\r?\n/)
-  .map((line) => line.trim())
-  .find((line) => line.endsWith(` ${releaseAssetName}`) || line.endsWith(` *${releaseAssetName}`));
-const expectedHash = checksumLine?.match(/^([a-f0-9]{64})\s+/i)?.[1]?.toLowerCase();
-if (!expectedHash) {
-  throw new Error(`Could not find the SHA-256 checksum for ${releaseAssetName}.`);
-}
-
-const binary = Buffer.from(await binaryResponse.arrayBuffer());
-const actualHash = createHash("sha256").update(binary).digest("hex");
-if (actualHash !== expectedHash) {
-  throw new Error("The downloaded yt-dlp executable failed its SHA-256 checksum.");
-}
-
-await mkdir(dirname(executablePath), { recursive: true });
-const temporaryPath = `${executablePath}.download`;
-try {
-  await writeFile(temporaryPath, binary);
-  if (process.platform !== "win32") {
-    await chmod(temporaryPath, 0o755);
+async function installRelease(release) {
+  const binaryAsset = release.assets?.find((asset) => asset.name === releaseAssetName);
+  const checksumAsset = release.assets?.find((asset) => asset.name === "SHA2-256SUMS");
+  if (!binaryAsset || !checksumAsset) {
+    throw new Error(`The latest yt-dlp release is missing ${releaseAssetName} or its checksum file.`);
   }
-  await rename(temporaryPath, executablePath);
-} catch (error) {
-  await unlink(temporaryPath).catch(() => {});
-  throw error;
-}
 
-const installed = await readFile(executablePath);
-if (installed.length !== binary.length) {
-  throw new Error("The installed yt-dlp executable is incomplete.");
+  const [checksumResponse, binaryResponse] = await Promise.all([
+    fetchOk(checksumAsset.browser_download_url, "text/plain"),
+    fetchOk(binaryAsset.browser_download_url, "application/octet-stream"),
+  ]);
+  const checksumText = await checksumResponse.text();
+  const checksumLine = checksumText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find((line) => line.endsWith(` ${releaseAssetName}`) || line.endsWith(` *${releaseAssetName}`));
+  const expectedHash = checksumLine?.match(/^([a-f0-9]{64})\s+/i)?.[1]?.toLowerCase();
+  if (!expectedHash) {
+    throw new Error(`Could not find the SHA-256 checksum for ${releaseAssetName}.`);
+  }
+
+  const binary = Buffer.from(await binaryResponse.arrayBuffer());
+  const actualHash = createHash("sha256").update(binary).digest("hex");
+  if (actualHash !== expectedHash) {
+    throw new Error("The downloaded yt-dlp executable failed its SHA-256 checksum.");
+  }
+
+  await mkdir(dirname(executablePath), { recursive: true });
+  const temporaryPath = `${executablePath}.download`;
+  try {
+    await writeFile(temporaryPath, binary);
+    if (process.platform !== "win32") {
+      await chmod(temporaryPath, 0o755);
+    }
+    await rename(temporaryPath, executablePath);
+  } catch (error) {
+    await unlink(temporaryPath).catch(() => {});
+    throw error;
+  }
+
+  const installed = await readFile(executablePath);
+  if (installed.length !== binary.length) {
+    throw new Error("The installed yt-dlp executable is incomplete.");
+  }
+  const verifiedVersion = execFileSync(executablePath, ["--version"], {
+    encoding: "utf8",
+    timeout: 60_000,
+    windowsHide: true,
+  }).trim();
+  if (verifiedVersion !== release.tag_name) {
+    throw new Error(`Expected yt-dlp ${release.tag_name}, but installed ${verifiedVersion}.`);
+  }
+  console.log(`Installed verified yt-dlp ${release.tag_name} for ${process.platform}.`);
 }
-console.log(`Installed verified yt-dlp ${release.tag_name} for ${process.platform}.`);
