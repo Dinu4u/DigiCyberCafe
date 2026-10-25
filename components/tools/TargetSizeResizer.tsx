@@ -164,7 +164,7 @@ export function TargetSizeResizer() {
 
   return <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 text-slate-900 dark:text-slate-100 sm:px-6 lg:px-10">
     <header className="flex flex-wrap items-end justify-between gap-4">
-      <div><p className="text-[10px] font-bold tracking-[0.16em] text-emerald-700 dark:text-emerald-300">PRIVATE FILE TOOL</p><h1 className="mt-2 text-3xl font-semibold">Reduce File Size</h1><p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">Resize images and flatten PDFs to an exact file-size limit, right in your browser.</p></div>
+      <div><p className="text-[10px] font-bold tracking-[0.16em] text-emerald-700 dark:text-emerald-300">PRIVATE FILE TOOL</p><h1 className="mt-2 text-3xl font-semibold">Reduce File Size</h1><p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">Resize images and compress PDFs locally, while keeping PDF pages readable.</p></div>
       <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"><ShieldCheck size={14} className="text-emerald-600" /> Never uploaded</span>
     </header>
 
@@ -201,7 +201,7 @@ export function TargetSizeResizer() {
           {result.pages && <div><span className="text-slate-500 dark:text-slate-400">PDF pages</span><strong className="mt-1 block">{result.pages}</strong></div>}
         </div>}
         <button type="button" onClick={downloadResult} disabled={!resultUrl || busy} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200"><ArrowDownToLine size={16} />Download compressed file</button>
-        <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">PDF pages are rasterized for smaller output, so text in the compressed copy will not be selectable. Images are exported as JPEG on a white background.</p>
+        <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">PDF pages are rasterized, so text will not be selectable. If the target would make pages unreadable, compression stops and asks for a larger target. Images are exported as JPEG on a white background.</p>
       </section>
     </section>
   </main>;

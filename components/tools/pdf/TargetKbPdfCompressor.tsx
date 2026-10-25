@@ -163,7 +163,7 @@ export function TargetKbPdfCompressor() {
           )}
         </div>
       )}
-      <div className="pdf-feature-note"><Download size={16} /> Compression runs locally; pages are rasterized, so the result is smaller but no longer contains selectable text.</div>
+      <div className="pdf-feature-note"><Download size={16} /> Compression runs locally and rasterizes pages, so text is not selectable. If the target would make pages unreadable, compression stops and asks for a larger target.</div>
     </section>
   );
 }

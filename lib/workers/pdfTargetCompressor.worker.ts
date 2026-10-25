@@ -1,5 +1,6 @@
 import { PDFDocument } from "pdf-lib";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
+import { MIN_PDF_JPEG_QUALITY, MIN_PDF_RENDER_SCALE } from "@/lib/pdf/compressionSettings";
 
 type CompressionRequest = {
   pdfBuffer: ArrayBuffer;
@@ -45,13 +46,13 @@ workerScope.onmessage = async ({ data }) => {
     for (let pageNumber = 1; pageNumber <= source.numPages; pageNumber += 1) {
       pages.push(await source.getPage(pageNumber));
     }
-    const scales = [1.5, 1, 0.8];
+    const scales = [1.5, MIN_PDF_RENDER_SCALE];
     let bestImages: Uint8Array[] | undefined;
     let bestSize = Number.POSITIVE_INFINITY;
     const byteBudgetKB = Math.max(0.5, targetKB - Math.max(1.5, pages.length * 0.15));
 
     for (const scale of scales) {
-      let low = 0.05;
+      let low = MIN_PDF_JPEG_QUALITY;
       let high = 0.95;
       let scaleBest: Uint8Array[] | undefined;
       let scaleBestSize = Number.POSITIVE_INFINITY;
@@ -107,7 +108,7 @@ workerScope.onmessage = async ({ data }) => {
     if (!bestImages) {
       await loadingTask.destroy();
       loadingTask = null;
-      throw new Error(`This PDF could not be compressed below ${targetKB} KB. Try a higher target size.`);
+      throw new Error(`This PDF cannot reach ${targetKB} KB while keeping its pages readable. Increase the target size and try again.`);
     }
 
     postProgress({ step: "assembling", pageCurrent: 0, pageTotal: pages.length, currentKB: bestSize });

@@ -1,5 +1,6 @@
 import { PDFDocument } from "pdf-lib";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
+import { MIN_PDF_JPEG_QUALITY, MIN_PDF_RENDER_SCALE } from "@/lib/pdf/compressionSettings";
 
 type WorkerRequest = {
   fileData: ArrayBuffer;
@@ -22,7 +23,6 @@ type PdfPageRecord = { page: pdfjs.PDFPageProxy; width: number; height: number }
 const MAX_IMAGE_PIXELS = 24_000_000;
 const MAX_RENDER_EDGE = 3000;
 const MIN_IMAGE_EDGE = 80;
-const MIN_PDF_SCALE = 0.12;
 const MAX_RESIZE_ATTEMPTS = 8;
 const QUALITY_ITERATIONS = 7;
 
@@ -189,13 +189,14 @@ async function compressPdf(data: WorkerRequest) {
       maxEdge = Math.max(maxEdge, viewport.width, viewport.height);
     }
     const startScale = Math.min(1.5, MAX_RENDER_EDGE / maxEdge, Math.sqrt(MAX_IMAGE_PIXELS / totalArea));
+    const minimumScale = Math.min(MIN_PDF_RENDER_SCALE, startScale);
     let scale = startScale;
     let bestPdf: Uint8Array | null = null;
-    let bestQuality = 0.01;
+    let bestQuality = MIN_PDF_JPEG_QUALITY;
 
     for (let attempt = 0; attempt < MAX_RESIZE_ATTEMPTS; attempt += 1) {
       workingCanvases = await renderPages(pageRecords, scale);
-      const minimumPdf = await encodePdf(workingCanvases, pageRecords, 0.01, "compressing");
+      const minimumPdf = await encodePdf(workingCanvases, pageRecords, MIN_PDF_JPEG_QUALITY, "compressing");
       postProgress("compressing", source.numPages, source.numPages);
       if (minimumPdf.byteLength <= data.targetSizeKB * 1024) {
         bestPdf = minimumPdf;
@@ -203,18 +204,18 @@ async function compressPdf(data: WorkerRequest) {
       }
 
       const scaleFactor = Math.sqrt((data.targetSizeKB * 1024) / minimumPdf.byteLength) * 0.95;
-      const nextScale = scale * scaleFactor;
-      if (nextScale < MIN_PDF_SCALE || nextScale >= scale) break;
+      const nextScale = Math.max(minimumScale, scale * scaleFactor);
+      if (nextScale >= scale) break;
       clearCanvases(workingCanvases);
       workingCanvases = [];
       scale = nextScale;
     }
 
     if (!bestPdf) {
-      throw new CompressionWorkerError("unreachable", `This PDF could not be reduced to ${data.targetSizeKB} KB. Try a larger target size.`);
+      throw new CompressionWorkerError("unreachable", `This PDF cannot reach ${data.targetSizeKB} KB while keeping its pages readable. Increase the target size and try again.`);
     }
 
-    let low = 0.01;
+    let low = MIN_PDF_JPEG_QUALITY;
     let high = 1;
     for (let iteration = 0; iteration < QUALITY_ITERATIONS; iteration += 1) {
       const quality = (low + high) / 2;
@@ -230,7 +231,7 @@ async function compressPdf(data: WorkerRequest) {
     }
 
     if (bestPdf.byteLength > data.targetSizeKB * 1024) {
-      throw new CompressionWorkerError("unreachable", `The compressed PDF is still larger than ${data.targetSizeKB} KB.`);
+      throw new CompressionWorkerError("unreachable", `This PDF cannot reach ${data.targetSizeKB} KB while keeping its pages readable. Increase the target size and try again.`);
     }
     postProgress("assembling", source.numPages, source.numPages);
     return { bytes: bestPdf, mimeType: "application/pdf" as const, quality: bestQuality, pages: source.numPages };
