@@ -24,10 +24,11 @@ const workerScope = self as unknown as {
   postMessage: (message: CompressionResponse) => void;
 };
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/legacy/build/pdf.worker.mjs", import.meta.url).toString();
 
 workerScope.onmessage = async ({ data }) => {
   let loadingTask: ReturnType<typeof pdfjs.getDocument> | null = null;
+  let pdfWorkerPort: Worker | null = null;
   try {
     const { pdfBuffer, targetKB, tolerancePercentage = 5 } = data;
     if (!(pdfBuffer instanceof ArrayBuffer) || !Number.isFinite(targetKB) || targetKB <= 0) {
@@ -36,6 +37,8 @@ workerScope.onmessage = async ({ data }) => {
     const tolerance = Math.max(0, Math.min(50, tolerancePercentage));
     postProgress({ step: "rendering", pageCurrent: 0, pageTotal: 0, currentKB: 0 });
 
+    pdfWorkerPort = new Worker(new URL("pdfjs-dist/legacy/build/pdf.worker.mjs", import.meta.url), { type: "module" });
+    pdfjs.GlobalWorkerOptions.workerPort = pdfWorkerPort;
     loadingTask = pdfjs.getDocument({ data: new Uint8Array(pdfBuffer), useWorkerFetch: false });
     const source = await loadingTask.promise;
     const pages = [];
@@ -127,6 +130,9 @@ workerScope.onmessage = async ({ data }) => {
   } catch (error) {
     await loadingTask?.destroy().catch(() => undefined);
     workerScope.postMessage({ success: false, error: error instanceof Error ? error.message : "Could not compress this PDF." });
+  } finally {
+    pdfjs.GlobalWorkerOptions.workerPort = null;
+    pdfWorkerPort?.terminate();
   }
 };
 

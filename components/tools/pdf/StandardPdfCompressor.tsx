@@ -36,8 +36,12 @@ export function StandardPdfCompressor() {
     setMessage("");
     try {
       const output = await compressPdfFile(file);
-      setCompressedData(new Uint8Array(await output.arrayBuffer()));
-      setMessage("Compression is complete. Compare the original and compressed previews before downloading.");
+      const outputData = new Uint8Array(await output.arrayBuffer());
+      setCompressedData(outputData);
+      const reduction = ((file.size - outputData.byteLength) / file.size) * 100;
+      setMessage(reduction > 0
+        ? `PDF optimization reduced the file by ${reduction.toFixed(1)}%. Compare the previews before downloading.`
+        : "This PDF has no compressible structure for the standard optimizer; its size did not decrease. Use the target-size compressor for smaller, rasterized pages.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not compress this PDF.");
     } finally {
