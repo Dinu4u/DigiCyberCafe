@@ -5,12 +5,13 @@ import Image from "next/image";
 import { ArrowDownToLine, AlertCircle, Check, FileText, ImagePlus, LoaderCircle, ShieldCheck, X } from "lucide-react";
 import { getLocalProcessingSupportIssue } from "@/lib/utils/browserRuntimeSupport";
 
-type ProgressPhase = "reading" | "rendering" | "compressing" | "assembling";
+type ProgressPhase = "reading" | "normalizing" | "rendering" | "compressing" | "assembling";
 type WorkerMessage =
   | { type: "progress"; phase: ProgressPhase; pagesDone: number; pagesTotal: number }
   | { type: "success"; resultData: ArrayBuffer; mimeType: "image/jpeg" | "application/pdf"; finalSizeKB: number; quality: number; width?: number; height?: number; pages?: number }
-  | { type: "failure"; message: string; kind: "invalid" | "unsupported" | "unreachable" | "processing" };
+  | { type: "failure"; message: string; kind: "invalid" | "unsupported" | "unreachable" | "processing" | "decode" };
 type CompressionResult = Extract<WorkerMessage, { type: "success" }>;
+type WorkerTerminalMessage = Exclude<WorkerMessage, { type: "progress" }>;
 
 const QUICK_TARGETS = [20, 50, 100, 200];
 const MAX_FILE_BYTES = 100 * 1024 * 1024;
@@ -93,46 +94,53 @@ export function TargetSizeResizer() {
 
     try {
       const fileData = await file.arrayBuffer();
-      const worker = new Worker(new URL("../../lib/workers/targetSizeCompressor.worker.ts", import.meta.url), { type: "module" });
-      workerRef.current = worker;
-      worker.onmessage = ({ data }: MessageEvent<WorkerMessage>) => {
-        if (data.type === "progress") {
-          setProgress(data);
-          return;
-        }
-        worker.terminate();
-        if (workerRef.current === worker) workerRef.current = null;
-        setBusy(false);
-        setProgress(null);
-        if (data.type === "failure") {
-          setError(data.message);
-          return;
-        }
-        if (!(data.resultData instanceof ArrayBuffer) || !Number.isFinite(data.finalSizeKB) || !Number.isFinite(data.quality) || !data.mimeType) {
-          setError("The compression worker returned an incomplete result. Reload the page and try again.");
-          return;
-        }
-        const blob = new Blob([data.resultData], { type: data.mimeType });
-        const url = URL.createObjectURL(blob);
-        setResult(data);
-        setResultUrl(url);
-        setNotice(data.finalSizeKB <= targetKB ? `Finished at ${data.finalSizeKB.toFixed(1)} KB.` : "The browser could not meet the target size.");
-      };
-      worker.onerror = () => {
-        worker.terminate();
-        if (workerRef.current === worker) workerRef.current = null;
-        setBusy(false);
-        setProgress(null);
-        setError("The compression worker stopped unexpectedly. Try a smaller file or another browser.");
-      };
-      worker.onmessageerror = () => {
-        worker.terminate();
-        if (workerRef.current === worker) workerRef.current = null;
-        setBusy(false);
-        setProgress(null);
-        setError("The browser could not receive the compression result. Try again with a smaller file.");
-      };
-      worker.postMessage({ fileData, fileName: file.name, mimeType: file.type, targetSizeKB: targetKB }, [fileData]);
+      const runWorker = (inputData: ArrayBuffer, fileName: string, mimeType: string) => new Promise<WorkerTerminalMessage>((resolve, reject) => {
+        const worker = new Worker(new URL("../../lib/workers/targetSizeCompressor.worker.ts", import.meta.url), { type: "module" });
+        workerRef.current = worker;
+        const finish = () => {
+          worker.terminate();
+          if (workerRef.current === worker) workerRef.current = null;
+        };
+        worker.onmessage = ({ data }: MessageEvent<WorkerMessage>) => {
+          if (data.type === "progress") {
+            setProgress(data);
+            return;
+          }
+          finish();
+          resolve(data);
+        };
+        worker.onerror = () => {
+          finish();
+          reject(new Error("The compression worker stopped unexpectedly. Try a smaller file or another browser."));
+        };
+        worker.onmessageerror = () => {
+          finish();
+          reject(new Error("The browser could not receive the compression result. Try again with a smaller file."));
+        };
+        worker.postMessage({ fileData: inputData, fileName, mimeType, targetSizeKB: targetKB }, [inputData]);
+      });
+
+      let data = await runWorker(fileData, file.name, file.type);
+      if (data.type === "failure" && data.kind === "decode" && !isPdfFile) {
+        setProgress({ type: "progress", phase: "normalizing", pagesDone: 0, pagesTotal: 0 });
+        const normalizedImage = await normalizeImageForWorker(file);
+        data = await runWorker(await normalizedImage.arrayBuffer(), `${file.name}.jpg`, "image/jpeg");
+      }
+      setBusy(false);
+      setProgress(null);
+      if (data.type === "failure") {
+        setError(data.message);
+        return;
+      }
+      if (!(data.resultData instanceof ArrayBuffer) || !Number.isFinite(data.finalSizeKB) || !Number.isFinite(data.quality) || !data.mimeType) {
+        setError("The compression worker returned an incomplete result. Reload the page and try again.");
+        return;
+      }
+      const blob = new Blob([data.resultData], { type: data.mimeType });
+      const url = URL.createObjectURL(blob);
+      setResult(data);
+      setResultUrl(url);
+      setNotice(data.finalSizeKB <= targetKB ? `Finished at ${data.finalSizeKB.toFixed(1)} KB.` : "The browser could not meet the target size.");
     } catch (caught) {
       workerRef.current?.terminate();
       workerRef.current = null;
@@ -160,7 +168,7 @@ export function TargetSizeResizer() {
   }
 
   const isPdf = file?.type === "application/pdf" || file?.name.toLowerCase().endsWith(".pdf") || false;
-  const progressLabel = progress?.phase === "reading" ? "Reading file" : progress?.phase === "rendering" ? "Rendering PDF pages" : progress?.phase === "compressing" ? "Finding the best quality" : "Assembling compressed PDF";
+  const progressLabel = progress?.phase === "reading" ? "Reading file" : progress?.phase === "normalizing" ? "Preparing image for compatibility" : progress?.phase === "rendering" ? "Rendering PDF pages" : progress?.phase === "compressing" ? "Finding the best quality" : "Assembling compressed PDF";
 
   return <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 text-slate-900 dark:text-slate-100 sm:px-6 lg:px-10">
     <header className="flex flex-wrap items-end justify-between gap-4">
@@ -205,6 +213,46 @@ export function TargetSizeResizer() {
       </section>
     </section>
   </main>;
+}
+
+async function normalizeImageForWorker(file: File) {
+  const sourceUrl = URL.createObjectURL(file);
+  const image = new window.Image();
+  let canvas: HTMLCanvasElement | null = null;
+  try {
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("The browser could not read this image. Re-save it as JPEG or PNG and try again."));
+      image.src = sourceUrl;
+    });
+    if (!image.naturalWidth || !image.naturalHeight) {
+      throw new Error("The browser could not read this image. Re-save it as JPEG or PNG and try again.");
+    }
+    const scale = Math.min(1, Math.sqrt(24_000_000 / (image.naturalWidth * image.naturalHeight)), 3000 / Math.max(image.naturalWidth, image.naturalHeight));
+    const width = Math.max(1, Math.floor(image.naturalWidth * scale));
+    const height = Math.max(1, Math.floor(image.naturalHeight * scale));
+    canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d", { alpha: false });
+    if (!context) throw new Error("The browser could not allocate an image canvas.");
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, width, height);
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(image, 0, 0, width, height);
+    const normalized = await new Promise<Blob>((resolve, reject) => {
+      canvas?.toBlob((blob) => blob ? resolve(blob) : reject(new Error("The browser could not prepare this image for compression.")), "image/jpeg", 0.95);
+    });
+    return normalized;
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+    if (canvas) {
+      canvas.width = 0;
+      canvas.height = 0;
+    }
+    image.src = "";
+  }
 }
 
 function PreviewPanel({ title, file, url, isPdf, sizeKB }: { title: string; file: File | null; url: string; isPdf: boolean; sizeKB: number | null }) {

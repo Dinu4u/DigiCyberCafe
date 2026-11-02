@@ -17,7 +17,7 @@ type ProgressMessage = {
 type WorkerResponse =
   | ProgressMessage
   | { type: "success"; resultData: ArrayBuffer; mimeType: "image/jpeg" | "application/pdf"; finalSizeKB: number; quality: number; width?: number; height?: number; pages?: number }
-  | { type: "failure"; message: string; kind: "invalid" | "unsupported" | "unreachable" | "processing" };
+  | { type: "failure"; message: string; kind: "invalid" | "unsupported" | "unreachable" | "processing" | "decode" };
 type PdfPageRecord = { page: pdfjs.PDFPageProxy; width: number; height: number };
 
 const MAX_IMAGE_PIXELS = 24_000_000;
@@ -80,7 +80,11 @@ async function compressImage(data: WorkerRequest) {
   let bitmap: ImageBitmap | null = null;
   let canvas: OffscreenCanvas | null = null;
   try {
-    bitmap = await createImageBitmap(new Blob([data.fileData], { type: data.mimeType }));
+    try {
+      bitmap = await createImageBitmap(new Blob([data.fileData], { type: data.mimeType }));
+    } catch {
+      throw new CompressionWorkerError("decode", "The background processor could not decode the source image.");
+    }
     if (!bitmap.width || !bitmap.height) throw new CompressionWorkerError("invalid", "The image could not be decoded.");
     const targetBytes = data.targetSizeKB * 1024;
     const initialScale = Math.min(1, Math.sqrt(MAX_IMAGE_PIXELS / (bitmap.width * bitmap.height)), MAX_RENDER_EDGE / Math.max(bitmap.width, bitmap.height));
@@ -305,7 +309,7 @@ function postProgress(phase: ProgressMessage["phase"], pagesDone = 0, pagesTotal
 }
 
 class CompressionWorkerError extends Error {
-  constructor(readonly kind: "invalid" | "unsupported" | "unreachable" | "processing", message: string) {
+  constructor(readonly kind: "invalid" | "unsupported" | "unreachable" | "processing" | "decode", message: string) {
     super(message);
     this.name = "CompressionWorkerError";
   }
