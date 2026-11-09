@@ -10,7 +10,7 @@ import type { ToolFaq, ToolHowToStep } from "@/types/advertising";
 const title =
   "Sarkari Exam Age Calculator";
 const description =
-  "Calculate exact exam age from Gregorian or Hindu lunar birth dates. Convert Vikram Samvat, Purnimanta month, paksha and tithi to a Gregorian date using birth city and optional birth time.";
+  "Calculate exact age on an exam cutoff date or work experience between two dates. See indicative government exam eligibility while keeping date calculations on your device.";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/tools/sarkari-exam-age-calculator" },
@@ -19,17 +19,17 @@ export const metadata: Metadata = {
 };
 
 const steps: ToolHowToStep[] = [
-  { name: "Enter birth date", text: "Enter a Gregorian birth date or choose a Hindu lunar date with Vikram Samvat year, Purnimanta month, paksha, tithi, and birth city." },
-  { name: "Set the cutoff", text: "Choose the recruitment notification cutoff date; eligibility is evaluated as of this date." },
-  { name: "Review the estimate", text: "Check your exact age and compare the catalog's indicative central or state age ranges with your selected options." },
+  { name: "Choose a calculation", text: "Select age and exam eligibility, or work experience." },
+  { name: "Enter the dates", text: "Enter a date of birth or experience start date, then choose the exam cutoff date or experience end date." },
+  { name: "Review the result", text: "Check the calculated years, months, and days. Age results also show indicative central or state exam age ranges." },
 ];
 
 const faqs: ToolFaq[] = [
   { question: "How is age calculated on a government exam cutoff date?", answer: "The calculator compares the Gregorian birth date with the cutoff date and returns years, months, and days. Always follow the date and rules in the official recruitment notice." },
+  { question: "Will the calculator show my age if I am too young for an exam?", answer: "Yes. It calculates and displays your age, then marks the listed exams as under-age when their minimum age is not met." },
+  { question: "Can I calculate work experience?", answer: "Yes. Choose Work experience, enter the experience start date and end date, and the calculator returns the duration in years, months, and days." },
   { question: "Does category relaxation guarantee eligibility?", answer: "No. The calculator applies simplified indicative relaxations. Official exam notices may include post, service, domicile, and other conditions." },
-  { question: "How does Hindu lunar date conversion work?", answer: "Choose the Vikram Samvat year, Purnimanta masa, paksha, and tithi. The calculator uses the selected birth city for its time zone and local sunrise, then resolves matching Gregorian dates in your browser. An optional birth time checks the tithi at that time; without it, tithi is checked at local sunrise." },
-  { question: "What does the Adhika month option mean?", answer: "Select it only when your recorded Panchang date names an Adhika (intercalary) masa. The calculated result is an astronomical estimate; regional Panchang conventions can differ, so verify dates against family records or a trusted local Panchang." },
-  { question: "Is my date of birth uploaded?", answer: "No. DOB, time, and selected lunar date stay in the browser. Only the city-name lookup is sent through DigiCyberCafe to Open-Meteo's geocoding service; coordinates returned for the selected city are used locally." },
+  { question: "Are my dates uploaded?", answer: "No. Age, experience, and eligibility calculations run locally in your browser." },
 ];
 
 export default function SarkariExamAgeCalculatorPage() {
@@ -74,30 +74,24 @@ export default function SarkariExamAgeCalculatorPage() {
             Always use the exact cutoff date, qualification and category wording in the
             official notification before relying on an eligibility decision.
           </p>
-          <h2>Calendar conversion note</h2>
+          <h2>Calculate work experience</h2>
           <p>
-            Gregorian dates remain the baseline for age and eligibility comparisons. The
-            optional Hindu lunar input resolves a Vikram Samvat year, Purnimanta masa,
-            paksha, and tithi to a Gregorian date using astronomical moon phases, a
-            sidereal month estimate, and local sunrise for the selected birth city. If birth
-            time is entered, the tithi is checked at that local time; otherwise it is checked
-            at local sunrise. The city name is looked up through Open-Meteo geocoding, while
-            the DOB, time, and lunar selections remain in the browser. Panchang and
-            intercalary-month conventions differ by region; treat this as an estimate and
-            confirm it against family records or a trusted local Panchang.
+            Choose Work experience, enter the job start date, and set the end date (today by
+            default) to calculate the elapsed years, months, and days. This is a date
+            difference only and does not verify employment history.
           </p>
         </section>
         <ToolContentSection
-          title="How government exam cutoff age is evaluated"
-          introduction="Exam age is normally measured on the cutoff date specified in a recruitment notification. This tool calculates an exact Gregorian age and compares it with a catalog of indicative age ranges; it does not replace official eligibility rules."
+          title="Calculate age, exam eligibility, and work experience"
+          introduction="Calculate age on a recruitment cutoff date or calculate work experience between two dates. Exam age ranges are indicative only and do not replace the official recruitment notification."
           steps={steps}
           specifications={[
             { label: "Date basis", value: "Gregorian calendar dates, compared by calendar years, months, and days." },
             { label: "Category", value: "Optional illustrative relaxation; rules vary by exam, post, and notification." },
-            { label: "Calendar", value: "Hindu lunar dates resolve locally using Purnimanta month, paksha, tithi, birth city, and optional time." },
+            { label: "Work experience", value: "Elapsed time between the entered start and end dates; employment is not verified." },
             { label: "Authority", value: "The current official recruitment notification is authoritative." },
           ]}
-          privacy="Birth date, birth time, lunar-date selection, and age computations run locally in the browser. Only the entered city name is used by the server-side Open-Meteo geocoding lookup; the DOB is not sent. Results are estimates and are not submitted to an exam authority."
+          privacy="Date, age, experience, and eligibility calculations run locally in your browser. Dates are not sent to a server, and results are not submitted to an exam authority."
           faqs={faqs}
         />
         <style>{`

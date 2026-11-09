@@ -87,77 +87,6 @@
   font: 10px/1.4 Arial, sans-serif;
 }
 
-.hinduFields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.hinduFields input,
-.hinduFields select {
-  min-width: 0;
-}
-
-.adhikaChoice {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #5f6d62;
-  font: 11px/1.4 Arial, sans-serif;
-}
-
-.adhikaChoice input {
-  width: 15px;
-  min-height: 15px;
-  margin: 0;
-  accent-color: #476b4f;
-}
-
-.cityButton,
-.convertButton,
-.candidateList button {
-  min-height: 40px;
-  border: 1px solid #dce6dc;
-  border-radius: 5px;
-  padding: 9px 11px;
-  color: #476b4f;
-  background: white;
-  font: 700 11px Arial, sans-serif;
-  cursor: pointer;
-}
-
-.cityButton:disabled,
-.convertButton:disabled {
-  cursor: not-allowed;
-  opacity: .55;
-}
-
-.calendarNote,
-.candidateList {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: #78837a;
-  font: 10px/1.5 Arial, sans-serif;
-}
-
-.candidateList {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  border-top: 1px solid #e6ece6;
-  padding: 16px 28px;
-}
-
-.candidateList strong,
-.candidateList span {
-  width: 100%;
-}
-
-.candidateList button {
-  min-height: 34px;
-}
-
 .optional {
   margin-top: 19px;
   padding-top: 16px;
@@ -344,8 +273,7 @@
   }
 
   .fields,
-  .optionalFields,
-  .hinduFields {
+  .optionalFields {
     grid-template-columns: 1fr;
   }
 
@@ -359,10 +287,6 @@
 
   .alert {
     margin: 15px 18px 0;
-  }
-
-  .candidateList {
-    padding: 16px 18px;
   }
 
   .tabList {

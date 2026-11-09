@@ -38,12 +38,8 @@ export default function PrivacyPolicyPage() {
             affect local data.
           </p>
           <p className="mt-2">
-            The exam age calculator also supports a Hindu lunar birth-date input. Its birth
-            date, optional birth time, and calendar selections are processed in your browser.
-            If you use the city search, the city name you enter is sent to DigiCyberCafe and
-            forwarded to Open-Meteo&apos;s geocoding service to retrieve city coordinates and
-            time zone. The birth date and time are not included in that lookup. The returned
-            location is used locally for sunrise and calendar calculations.
+            The age and work-experience calculator compares dates in your browser. The
+            entered dates are not sent to DigiCyberCafe for those calculations.
           </p>
         </section>
         <section>
@@ -54,7 +50,6 @@ export default function PrivacyPolicyPage() {
             you choose to save, and technical request
             information such as IP address, browser details, and timestamps
             handled by the application or its hosting and security providers.
-            A Hindu-calendar city lookup also discloses the city query to Open-Meteo.
             Passwords are stored as hashes rather than readable passwords. The
             contact form opens your own email application; we receive a message
             only if you choose to send it.

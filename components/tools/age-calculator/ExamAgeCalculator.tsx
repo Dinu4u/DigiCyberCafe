@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import { CalendarDays } from "lucide-react";
 import {
   evaluateEligibility,
   examStates,
@@ -11,7 +10,6 @@ import {
   parseLocalDate,
   toLocalDateInputValue,
 } from "@/lib/utils/dateMath";
-import type { BirthLocation } from "@/lib/utils/hinduLunarCalendar";
 import type {
   ExactAge,
   Qualification,
@@ -25,26 +23,6 @@ type CalculatorError = {
   title: string;
   message: string;
   nextStep: string;
-};
-
-const hinduMasaNames = [
-  "Chaitra",
-  "Vaishakha",
-  "Jyeshtha",
-  "Ashadha",
-  "Shravana",
-  "Bhadrapada",
-  "Ashvina",
-  "Kartika",
-  "Margashirsha",
-  "Pausha",
-  "Magha",
-  "Phalguna",
-];
-
-type CitySearchResponse = {
-  results?: BirthLocation[];
-  error?: string;
 };
 
 const categoryLabels: Record<SocialCategory, string> = {
@@ -101,23 +79,10 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
   const defaultCutoffValue = useSyncExternalStore(subscribeToNothing, getTodayDateValue, () => "");
   const [dobOverride, setDobOverride] = useState<string | null>(null);
   const [cutoffOverride, setCutoffOverride] = useState<string | null>(null);
+  const [calculatorMode, setCalculatorMode] = useState<"age" | "experience">("age");
   const dobValue = dobOverride ?? "";
   const cutoffValue = cutoffOverride ?? defaultCutoffValue;
   const [dateTouched, setDateTouched] = useState(false);
-  const [calendarMode, setCalendarMode] = useState<"gregorian" | "hindu">("gregorian");
-  const [hinduYear, setHinduYear] = useState(String(new Date().getFullYear() - 30 + 57));
-  const [hinduMasa, setHinduMasa] = useState(0);
-  const [adhikaMasa, setAdhikaMasa] = useState(false);
-  const [hinduPaksha, setHinduPaksha] = useState<"Shukla" | "Krishna">("Shukla");
-  const [hinduTithi, setHinduTithi] = useState(1);
-  const [birthTime, setBirthTime] = useState("");
-  const [birthCity, setBirthCity] = useState("");
-  const [cityResults, setCityResults] = useState<BirthLocation[]>([]);
-  const [birthLocation, setBirthLocation] = useState<BirthLocation | null>(null);
-  const [citySearchPending, setCitySearchPending] = useState(false);
-  const [conversionPending, setConversionPending] = useState(false);
-  const [conversionError, setConversionError] = useState<CalculatorError | null>(null);
-  const [dateCandidates, setDateCandidates] = useState<string[]>([]);
   const [category, setCategory] = useState<SocialCategory>("UR");
   const [pwbdBaseCategory, setPwbdBaseCategory] = useState<PwbdBaseCategory>("UR");
   const [domicileState, setDomicileState] = useState("");
@@ -144,7 +109,7 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
       if (!dob || !cutoff) {
         return { calculation: null, error: invalidDateError };
       }
-      if (cutoff.getFullYear() < 1990 || cutoff.getFullYear() > 2035) {
+      if (calculatorMode === "age" && (cutoff.getFullYear() < 1990 || cutoff.getFullYear() > 2035)) {
         return {
           calculation: null,
           error: {
@@ -154,26 +119,29 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
           },
         };
       }
-      if (dob >= cutoff) {
+      if (dob > cutoff) {
         return {
           calculation: null,
           error: {
-            title: "Date of Birth in Future or Matches Cutoff",
-            message: "Date of Birth cannot be the same as or after the Cutoff Date.",
-            nextStep: "Please select a valid past birth date.",
+            title: calculatorMode === "age" ? "Date of Birth in Future" : "Start Date in Future",
+            message: calculatorMode === "age"
+              ? "Date of Birth cannot be after the cutoff date."
+              : "The experience start date cannot be after the end date.",
+            nextStep: "Please select valid dates in chronological order.",
           },
         };
       }
 
       const age = calculateExactAge(dob, cutoff);
-      if (age.years < 14) {
+      if (calculatorMode === "experience") {
         return {
-          calculation: null,
-          error: {
-            title: "Age Below 14 Years",
-            message: "Age is below the minimum legal threshold for government recruitment.",
-            nextStep: "Please enter a valid Date of Birth for candidates aged 14 years and older.",
+          calculation: {
+            age,
+            cutoffDate: cutoff,
+            startDate: dob,
+            eligibility: null,
           },
+          error: null,
         };
       }
 
@@ -190,6 +158,7 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
         calculation: {
           age,
           cutoffDate: cutoff,
+          startDate: dob,
           eligibility,
         },
         error: null,
@@ -199,94 +168,13 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
       return {
         calculation: null,
         error: {
-          title: "Unable to calculate eligibility",
+          title: calculatorMode === "age" ? "Unable to calculate age and eligibility" : "Unable to calculate experience",
           message: "The selected dates could not be calculated safely.",
           nextStep: "Check the dates and try again.",
         },
       };
     }
-  }, [category, cutoffValue, dateTouched, dobValue, domicileState, qualification, pwbdBaseCategory]);
-
-  async function searchBirthCity() {
-    setCitySearchPending(true);
-    setConversionError(null);
-    setCityResults([]);
-    setBirthLocation(null);
-    try {
-      const response = await fetch(`/api/geocode/cities?name=${encodeURIComponent(birthCity.trim())}`);
-      const data = (await response.json()) as CitySearchResponse;
-      if (!response.ok) throw new Error(data.error ?? "City lookup failed.");
-      const results = data.results ?? [];
-      if (results.length === 0) throw new Error("No matching city was found. Check the spelling and try again.");
-      setCityResults(results);
-      if (results.length === 1) setBirthLocation(results[0]);
-    } catch (caughtError) {
-      console.error("Birth city lookup failed.", caughtError);
-      setConversionError({
-        title: "Unable to find the birth city",
-        message: caughtError instanceof Error ? caughtError.message : "The city lookup could not be completed.",
-        nextStep: "Check the city name and retry. Your date-of-birth fields are not sent to the lookup service.",
-      });
-    } finally {
-      setCitySearchPending(false);
-    }
-  }
-
-  async function convertHinduBirthDate() {
-    const year = Number(hinduYear);
-    if (!Number.isSafeInteger(year) || year < 1957 || year > new Date().getFullYear() + 57) {
-      setConversionError({
-        title: "Invalid Vikram Samvat year",
-        message: "Enter a valid Vikram Samvat year.",
-        nextStep: "Use a year from 1957 through the current Gregorian year plus 57.",
-      });
-      return;
-    }
-    if (!birthLocation) {
-      setConversionError({
-        title: "Select your birth city",
-        message: "The city is needed to determine the local timezone and sunrise.",
-        nextStep: "Search for your birth city and select the correct result first.",
-      });
-      return;
-    }
-
-    setConversionPending(true);
-    setConversionError(null);
-    setDateCandidates([]);
-    try {
-      const { resolveHinduLunarBirthDate } = await import("@/lib/utils/hinduLunarCalendar");
-      const matches = resolveHinduLunarBirthDate({
-        samvatYear: year,
-        masaIndex: hinduMasa,
-        adhikaMasa,
-        paksha: hinduPaksha,
-        tithi: hinduTithi,
-        birthTime: birthTime || undefined,
-        location: birthLocation,
-      }).filter((date) => date <= getTodayDateValue());
-
-      if (matches.length === 0) {
-        throw new Error(
-          "No matching past Gregorian date was found. The chosen tithi may be skipped at sunrise, or the year, month, city, or birth-time convention may differ.",
-        );
-      }
-      setDateCandidates(matches);
-      if (matches.length === 1) {
-        setDobOverride(matches[0]);
-        setDateTouched(true);
-      }
-    } catch (caughtError) {
-      console.error("Hindu lunar date conversion failed.", caughtError);
-      setConversionError({
-        title: "Unable to resolve this Panchang date",
-        message: caughtError instanceof Error ? caughtError.message : "The selected lunar date could not be converted.",
-        nextStep: "Confirm the Vikram Samvat year, Purnimanta month, paksha, tithi, and birth city, then try again.",
-      });
-    } finally {
-      setConversionPending(false);
-    }
-  }
+  }, [calculatorMode, category, cutoffValue, dateTouched, dobValue, domicileState, qualification, pwbdBaseCategory]);
 
   const dob = useMemo(() => {
     try {
@@ -296,7 +184,7 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
       return null;
     }
   }, [dobValue]);
-  const selectedTabResults = calculation
+  const selectedTabResults = calculation?.eligibility
     ? activeTab === "central"
       ? calculation.eligibility.central
       : calculation.eligibility.state
@@ -306,165 +194,57 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
     <section className={styles.calculator} aria-labelledby="exam-age-heading">
       <div className={styles.intro}>
         <div>
-          <h2 id="exam-age-heading">Calculate age &amp; eligibility</h2>
+          <h2 id="exam-age-heading">Calculate age, eligibility &amp; experience</h2>
         </div>
       </div>
 
       <div className={styles.form}>
-        <div className={styles.calendarSwitch} role="group" aria-label="Date calendar mode">
+        <div className={styles.calendarSwitch} role="group" aria-label="Calculator mode">
           <button
-            className={calendarMode === "gregorian" ? styles.active : ""}
+            className={calculatorMode === "age" ? styles.active : ""}
             type="button"
-            aria-pressed={calendarMode === "gregorian"}
-            onClick={() => setCalendarMode("gregorian")}
+            aria-pressed={calculatorMode === "age"}
+            onClick={() => setCalculatorMode("age")}
           >
-            Gregorian (English)
+            Age &amp; exam eligibility
           </button>
           <button
-            className={calendarMode === "hindu" ? styles.active : ""}
+            className={calculatorMode === "experience" ? styles.active : ""}
             type="button"
-            aria-pressed={calendarMode === "hindu"}
-            onClick={() => setCalendarMode("hindu")}
+            aria-pressed={calculatorMode === "experience"}
+            onClick={() => setCalculatorMode("experience")}
           >
-            Hindu lunar Panchang
+            Work experience
           </button>
         </div>
 
         <div className={styles.fields}>
           <div className={styles.field}>
-            Date of birth
-            {calendarMode === "gregorian" ? (
-              <input
-                id="dob-input"
-                type="date"
-                value={dobValue}
-                max={toLocalDateInputValue(new Date())}
-                onChange={(event) => {
-                  setDobOverride(event.target.value);
-                  setDateTouched(true);
-                }}
-                aria-label="Date of birth"
-              />
-            ) : (
-              <div className={styles.hinduFields}>
-                <label className={styles.field}>
-                  Vikram Samvat year
-                  <input
-                    type="number"
-                    min="1957"
-                    max={new Date().getFullYear() + 57}
-                    value={hinduYear}
-                    onChange={(event) => setHinduYear(event.target.value)}
-                  />
-                </label>
-                <label className={styles.field}>
-                  Purnimanta month
-                  <select value={hinduMasa} onChange={(event) => setHinduMasa(Number(event.target.value))}>
-                    {hinduMasaNames.map((masa, index) => <option value={index} key={masa}>{masa}</option>)}
-                  </select>
-                </label>
-                <label className={styles.adhikaChoice}>
-                  <input
-                    type="checkbox"
-                    checked={adhikaMasa}
-                    onChange={(event) => setAdhikaMasa(event.target.checked)}
-                  />
-                  This is an Adhika (intercalary) month
-                </label>
-                <label className={styles.field}>
-                  Paksha
-                  <select
-                    value={hinduPaksha}
-                    onChange={(event) => setHinduPaksha(event.target.value as "Shukla" | "Krishna")}
-                  >
-                    <option value="Shukla">Shukla (bright half)</option>
-                    <option value="Krishna">Krishna (dark half)</option>
-                  </select>
-                </label>
-                <label className={styles.field}>
-                  Tithi
-                  <select value={hinduTithi} onChange={(event) => setHinduTithi(Number(event.target.value))}>
-                    {Array.from({ length: 15 }, (_, index) => (
-                      <option key={index + 1} value={index + 1}>
-                        {index === 14
-                          ? hinduPaksha === "Shukla" ? "15 — Purnima" : "15 — Amavasya"
-                          : `${index + 1}`}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className={styles.field}>
-                  Birth city
-                  <input
-                    value={birthCity}
-                    maxLength={120}
-                    onChange={(event) => {
-                      setBirthCity(event.target.value);
-                      setBirthLocation(null);
-                      setCityResults([]);
-                    }}
-                    placeholder="e.g. Patna, Bihar"
-                  />
-                </label>
-                <button
-                  className={styles.cityButton}
-                  type="button"
-                  disabled={citySearchPending || birthCity.trim().length < 2}
-                  onClick={searchBirthCity}
-                >
-                  {citySearchPending ? "Finding city..." : "Find city"}
-                </button>
-                {cityResults.length > 0 && (
-                  <label className={styles.field}>
-                    Select matching city
-                    <select
-                      value={birthLocation ? `${birthLocation.latitude},${birthLocation.longitude}` : ""}
-                      onChange={(event) => {
-                        const selected = cityResults.find(
-                          (place) => `${place.latitude},${place.longitude}` === event.target.value,
-                        );
-                        setBirthLocation(selected ?? null);
-                      }}
-                    >
-                      <option value="">Choose a city result</option>
-                      {cityResults.map((place) => (
-                        <option key={`${place.latitude},${place.longitude}`} value={`${place.latitude},${place.longitude}`}>
-                          {[place.name, place.admin1, place.country].filter(Boolean).join(", ")}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                )}
-                <label className={styles.field}>
-                  Birth time <span>(optional)</span>
-                  <input type="time" value={birthTime} onChange={(event) => setBirthTime(event.target.value)} />
-                </label>
-                <button
-                  className={styles.convertButton}
-                  type="button"
-                  disabled={conversionPending || !birthLocation}
-                  onClick={convertHinduBirthDate}
-                >
-                  {conversionPending ? "Calculating..." : "Convert Hindu date"}
-                </button>
-                <p className={styles.calendarNote}>
-                  If time is unknown, tithi is checked at local sunrise. City name is used only to find
-                  coordinates/time zone; calendar calculations stay in this browser.
-                </p>
-              </div>
-            )}
+            {calculatorMode === "age" ? "Date of birth" : "Experience start date"}
+            <input
+              id="start-date-input"
+              type="date"
+              value={dobValue}
+              max={toLocalDateInputValue(new Date())}
+              onChange={(event) => {
+                setDobOverride(event.target.value);
+                setDateTouched(true);
+              }}
+              aria-label={calculatorMode === "age" ? "Date of birth" : "Experience start date"}
+            />
             <span className={styles.fieldHint}>
-              {dob
-                ? `${formatDate(dob)} · Gregorian date used for age calculation`
-                : calendarMode === "gregorian" ? "Select a complete date." : "Choose a lunar date and birth city, then convert."}
+              {dob ? formatDate(dob) : "Select a complete date."}
             </span>
           </div>
           <div className={styles.field}>
-            <label htmlFor="cutoff-date">Exam cutoff date</label>
+            <label htmlFor="cutoff-date">
+              {calculatorMode === "age" ? "Exam cutoff date" : "Experience end date"}
+            </label>
             <input
               id="cutoff-date"
               type="date"
               value={cutoffValue}
+              max={calculatorMode === "experience" ? toLocalDateInputValue(new Date()) : undefined}
               onChange={(event) => {
                 setCutoffOverride(event.target.value);
                 setDateTouched(true);
@@ -474,7 +254,7 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
           </div>
         </div>
 
-        <div className={styles.optional}>
+        {calculatorMode === "age" && <div className={styles.optional}>
           <p className={styles.optionalHeading}>
             Check Sarkari exam Eligibility
           </p>
@@ -529,28 +309,8 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
               Showing General (UR) eligibility. Select a category to check reservation relaxations.
             </p>
           )}
-        </div>
+        </div>}
       </div>
-
-      {conversionError && <ErrorAlert error={conversionError} />}
-      {dateCandidates.length > 1 && (
-        <div className={styles.candidateList} aria-live="polite">
-          <strong>This lunar tithi occurred at sunrise on more than one date.</strong>
-          <span>Select the Gregorian birth date that matches your records:</span>
-          {dateCandidates.map((date) => (
-            <button
-              type="button"
-              key={date}
-              onClick={() => {
-                setDobOverride(date);
-                setDateTouched(true);
-              }}
-            >
-              {formatDate(parseLocalDate(date)!)}
-            </button>
-          ))}
-        </div>
-      )}
 
       {error && <ErrorAlert error={error} />}
 
@@ -559,22 +319,26 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
           <div className={styles.summary}>
             <div>
               <p className={styles.summaryLabel}>
-                Exact age on {formatDate(calculation.cutoffDate)} · DOB {formatDate(dob!)}
+                {calculatorMode === "age" ? "Exact age" : "Experience duration"} on{" "}
+                {formatDate(calculation.cutoffDate)} ·{" "}
+                {calculatorMode === "age" ? "DOB" : "Start date"} {formatDate(calculation.startDate)}
               </p>
               <p className={styles.age}>{ageMessage(calculation.age)}</p>
               <div className={styles.summaryMeta}>
-                <span className={styles.pill}>
-                  Evaluated under {categoryLabels[category]} norms
-                  {getRelaxation(category, pwbdBaseCategory) > 0 &&
-                    ` (+${getRelaxation(category, pwbdBaseCategory)} years modeled)`}
-                </span>
+                {calculatorMode === "age" ? (
+                  <span className={styles.pill}>
+                    Evaluated under {categoryLabels[category]} norms
+                    {getRelaxation(category, pwbdBaseCategory) > 0 &&
+                      ` (+${getRelaxation(category, pwbdBaseCategory)} years modeled)`}
+                  </span>
+                ) : <span className={styles.pill}>Work experience duration</span>}
               </div>
             </div>
             <button
               type="button"
               className={styles.editButton}
               onClick={() => {
-                document.getElementById("dob-input")?.focus();
+                document.getElementById("start-date-input")?.focus();
                 document.getElementById("exam-age-heading")?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             >
@@ -582,7 +346,7 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
             </button>
           </div>
 
-          <div className={styles.tabs}>
+          {calculatorMode === "age" && calculation.eligibility && <div className={styles.tabs}>
             <div className={styles.tabList} role="tablist" aria-label="Exam eligibility results">
               <button
                 type="button"
@@ -618,19 +382,25 @@ export function ExamAgeCalculator({ compact = false }: { compact?: boolean }) {
               role="tabpanel"
               aria-labelledby={activeTab === "central" ? "central-tab" : "state-tab"}
             >
+              {selectedTabResults.length > 0 &&
+                selectedTabResults.every((result) => result.status === "UNDER_AGE") && (
+                  <div className={styles.alert} role="status">
+                    <strong>Age calculated, but below exam eligibility age</strong>
+                    <p>Your age is shown above. You are below the minimum age for the listed exams in this result set.</p>
+                  </div>
+                )}
               <ExamEligibilityCards results={selectedTabResults} />
             </div>
             <p className={styles.disclaimer}>
               Estimates only — actual age cutoffs, category relaxations, qualifications and domicile rules
               differ by post and notification. Check the official notice linked on each card before applying.
-              Hindu lunar-date conversion is an astronomical estimate; regional Panchang conventions may differ.
             </p>
-          </div>
+          </div>}
         </div>
       )}
       {!compact && (
         <div className={styles.fieldHint} style={{ padding: "0 28px 18px" }}>
-          <CalendarDays size={13} aria-hidden="true" /> DOB and calendar calculations stay on this device; only the entered city is used for lookup.
+          Age, experience, and eligibility calculations stay on this device.
         </div>
       )}
     </section>
