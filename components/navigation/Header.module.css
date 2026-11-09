@@ -24,6 +24,25 @@
   text-decoration: none;
 }
 
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: auto;
+  color: #4b5c50;
+  font: 13px Arial, sans-serif;
+}
+
+.navigation a {
+  text-decoration: none;
+}
+
+.navigation a:hover {
+  color: #254b38;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .brand:focus-visible,
 .inner :global(.icon-button:focus-visible),
 .inner :global(.language-button:focus-visible),
@@ -122,6 +141,10 @@
   .inner :global(.topbar-actions) {
     margin-left: auto;
   }
+
+  .navigation {
+    margin-left: auto;
+  }
 }
 
 @media (max-width: 680px) {
@@ -149,6 +172,10 @@
   }
 
   .brandBadge {
+    display: none;
+  }
+
+  .navigation {
     display: none;
   }
 

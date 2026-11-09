@@ -9,6 +9,8 @@
 - Build marriage biodata documents and create invoices or quotations with tax fields and optional UPI QR codes.
 
 ## Primary endpoints
+- [All tools](https://www.digicybercafe.online/tools): Browse the public PDF, image, exam, and business tools by category.
+- [Practical guides](https://www.digicybercafe.online/guides): Find guidance for preparing uploads and passport or visa photos.
 - [Exam photo with name and date](https://www.digicybercafe.online/tools/photo-name-date-generator): Prepare a photo with candidate name/date text, select the SSC/UPSC preset (413 × 531 px), and choose optional output settings. Supported image input and export formats are listed in the tool.
 - [Target KB file resizer](https://www.digicybercafe.online/tools/target-kb-file-resizer): Resize supported JPEG, PNG, WebP, and PDF files toward a selected KB target; the browser reports whether it met the requested size.
 - [Passport photo maker](https://www.digicybercafe.online/tools/passport-photo-maker): Crop and adjust a photo using India, US/Visa/Schengen, Europe/UK/Australia, or custom dimension presets. Verify current destination requirements before use.
@@ -16,6 +18,10 @@
 - [Marriage biodata maker](https://www.digicybercafe.online/builder/biodata): Create and export a marriage biodata profile.
 - [Invoice and quotation generator](https://www.digicybercafe.online/tools/free-invoice-generator): Prepare quotations, invoices, and related business documents with optional tax and UPI QR details.
 - [Barcode and QR code generator](https://www.digicybercafe.online/tools/barcode-qr-generator): Generate supported barcode and QR code formats.
+
+## Practical guides
+- [Reduce a file for an online form](https://www.digicybercafe.online/guides/reduce-file-size-for-online-forms): Check the destination's file requirements, choose an appropriate image or PDF workflow, and inspect the output.
+- [Prepare a passport or visa photo](https://www.digicybercafe.online/guides/prepare-passport-photo-for-an-online-application): Use the issuing authority's current specifications to prepare and verify an image.
 
 ## Privacy and processing
 - Processing differs between features. Many file-editing workflows run in the browser; account storage, media extraction, translation, and other external-service features may send information to servers or third parties.

@@ -78,11 +78,12 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-xl font-semibold text-slate-900">5. Cookies, analytics, Google services, and advertising</h2>
           <p className="mt-2">
             Essential session or security technologies may be used for sign-in and
-            service operation. Google Analytics is loaded automatically when a
-            page is visited; there is no analytics opt-in prompt on this site.
-            Google Analytics may use cookies or similar technologies and process
-            technical information such as page views, device/browser details, and
-            approximate location.
+            service operation. If a Google Tag Manager container is configured,
+            it and Google Analytics load only after you choose to allow analytics.
+            You can reject analytics or change your choice using Analytics
+            settings in the footer. If enabled, Google Analytics may use cookies
+            or similar technologies and process technical information such as
+            page views, device/browser details, and approximate location.
             Google&apos;s data practices are described in its{" "}
             <a className="underline" href="https://policies.google.com/privacy" rel="noreferrer" target="_blank">
               Privacy Policy
@@ -100,9 +101,9 @@ export default function PrivacyPolicyPage() {
             . References to a &quot;DART cookie&quot; are historical; current Google
             advertising may use different cookies or identifiers and should be
             reviewed through Google&apos;s current disclosures and controls.
-            Depending on your location, additional consent or disclosures may be
-            required before non-essential analytics or advertising technologies
-            are used.
+            Advertising and other non-essential tags are not enabled by this
+            analytics choice. Any future non-essential technologies will require
+            suitable consent and updated disclosures before activation.
           </p>
         </section>
         <section>

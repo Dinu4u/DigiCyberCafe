@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { AD_CONFIG } from "@/config/adPolicy";
+import { AnalyticsPreferencesButton } from "@/components/analytics/AnalyticsPreferencesButton";
 
 const primaryLinks = [
-  { href: "/#tools", label: "All Tools" },
+  { href: "/tools", label: "All Tools" },
+  { href: "/guides", label: "Guides" },
   { href: "/tools/sarkari-exam-age-calculator", label: "Sarkari / Exam Tools" },
   { href: "/tools/pdf", label: "PDF Utilities" },
   { href: "/privacy-policy", label: "Privacy First" },
@@ -74,6 +76,7 @@ export function Footer() {
                   {label}
                 </Link>
               ))}
+              <AnalyticsPreferencesButton />
             </nav>
             <p className="text-xs text-slate-400">
               © {new Date().getFullYear()} DigiCyberCafe

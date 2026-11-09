@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 type Guide = {
   title: string;
@@ -342,26 +343,25 @@ const guides: Record<string, Guide> = {
       { question: "Can I repost downloaded material?", answer: "Only when you have the necessary rights and comply with platform rules and applicable law." },
     ],
   },
-};
-
-const defaultGuide: Guide = {
-  title: "How to use this online utility carefully",
-  purpose: "This browser utility is intended to make a focused document, image, or information task easier. Start by identifying what the destination or your own workflow actually requires, then use the matching controls rather than changing settings unnecessarily. A tool-generated result is an aid: it cannot decide whether a document is legally sufficient, an image meets an authority's requirements, or a calculation applies to your circumstances.",
-  workflow: "Prepare a copy of the source where possible, check that the file type is supported, and enter only the information needed. Follow the on-screen steps in order and use the preview to catch mistakes before exporting. Browser memory, device performance, file complexity, and format support can affect completion. If an operation fails, preserve the original and try a supported, smaller copy rather than repeatedly submitting sensitive data.",
-  review: "Open every exported file in a separate viewer. Verify page order, dimensions, spelling, dates, readability, file size, and any signatures or metadata relevant to your task. Compare important values with the source and follow the receiving service's latest requirements. Keep an unmodified original until you know the output is usable; a successful download or preview is not a guarantee of acceptance.",
-  privacy: "Many DigiCyberCafe photo, PDF, and document utilities are designed to process files in your browser. The site also has server-backed account, saved-document, and office-conversion functions. Processing differs by tool: read the local notice and the Privacy Policy before selecting confidential files. Browser extensions, synced browsing, downloaded outputs, and shared devices are outside our control.",
-  faq: [
-    { question: "Are all DigiCyberCafe tools fully client-side?", answer: "No. Many file utilities process in the browser, but account, saved-document, and some conversion features use servers. The Privacy Policy explains the difference." },
-    { question: "Does a generated result guarantee acceptance?", answer: "No. Always check the receiving authority's current requirements and review the output yourself." },
-    { question: "What should I do before processing an important file?", answer: "Keep a separate original, remove unrelated sensitive information, and read the tool's processing notice." },
-    { question: "Where can I ask a question or report an error?", answer: "Contact the operator at ecybercafe.official@gmail.com or use the Contact page." },
-  ],
+  "video-compressor-reduce-size": {
+    title: "Compressing a video in the browser",
+    purpose: "This video compressor uses a browser worker to encode supported videos as MP4 at up to 720 pixels tall. Compression does not guarantee a smaller file: source codec, bitrate, dimensions, and audio all affect the result.",
+    workflow: "Start with a copy of a supported video no larger than 120 MB. Let the browser finish encoding, then compare the reported output size and percentage change with the original. Encoding can take time and memory, especially on older or mobile devices.",
+    review: "Play the exported MP4 and check picture quality, orientation, duration, and audio. The output includes the first video stream and available audio streams; embedded subtitles and other non-video streams are omitted. Keep the original if those tracks or higher resolution matter.",
+    privacy: "The selected video is processed locally by FFmpeg.wasm in a browser worker and is not uploaded to DigiCyberCafe. The FFmpeg runtime is downloaded from a CDN. Browser memory and processor limits vary by device.",
+    faq: [
+      { question: "Will compression always make my video smaller?", answer: "No. Some source videos produce a larger MP4. Check the measured output size before replacing or sharing the original." },
+      { question: "What resolution and tracks does the MP4 keep?", answer: "The maximum video height is 720 pixels, with aspect ratio preserved. The first video stream and available audio are included; subtitles and other non-video streams are not." },
+    ],
+  },
 };
 
 export default function AdSenseContentSection() {
   const pathname = usePathname();
   const slug = pathname.split("/").filter(Boolean).at(-1) ?? "";
-  const guide = guides[slug] ?? defaultGuide;
+  const guide = guides[slug];
+
+  if (pathname === "/tools" || !guide) return null;
 
   return (
     <section aria-labelledby="tool-guide-title" className="mx-auto my-10 max-w-5xl rounded-xl border border-slate-200 bg-white p-5 text-sm leading-7 text-slate-600 sm:p-8">
@@ -373,37 +373,32 @@ export default function AdSenseContentSection() {
       <p className="mt-2">{guide.review}</p>
       <h3 className="mt-7 text-lg font-semibold text-slate-900">Privacy and responsible use</h3>
       <p className="mt-2">{guide.privacy}</p>
-      <h3 className="mt-7 text-lg font-semibold text-slate-900">A careful final check</h3>
-      <p className="mt-2">
-        Before you begin, identify the exact outcome you need and the rules of the
-        service that will receive it. A file-size limit, image dimension, page
-        order, or calculation date can be more important than a default setting.
-        Keep source material unchanged, use only the minimum personal information
-        required, and do not enter credentials or payment secrets into a general
-        utility. If the browser reports an unsupported file or an incomplete
-        result, stop and verify the source rather than assuming the export is
-        correct.
-      </p>
-      <p className="mt-3">
-        After processing, compare the output with the source and test it in the
-        context where it will be used. Check the receiving organization&apos;s current
-        instructions, confirm that the format and file size are accepted, and
-        retain a secure copy of important originals. For official, financial,
-        legal, or identity documents, ask the responsible authority or a
-        qualified professional when a decision depends on interpretation. These
-        practical checks help catch common errors, but they do not replace an
-        official review or guarantee that a result will be accepted.
-      </p>
-      <p className="mt-3">
-        Keep a clear distinction between a file saved only on your device and a
-        file deliberately sent to an outside service. Some browser tools load
-        fonts or models from third parties, and translation sends selected text
-        to its provider after you give consent. Review prompts before confirming,
-        close the page when finished on a shared computer, and delete temporary
-        downloads or local browser data when appropriate. If a tool uses a
-        server-backed feature, its processing route should be checked in the
-        Privacy Policy before submitting sensitive material.
-      </p>
+      <nav aria-label="Related resources" className="mt-7 border-t border-slate-200 pt-5">
+        <h3 className="font-semibold text-slate-900">Related resources</h3>
+        <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+          <li>
+            <Link className="underline underline-offset-2" href="/tools">
+              Browse all tools
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="underline underline-offset-2"
+              href="/guides/reduce-file-size-for-online-forms"
+            >
+              Reduce a file for an online form
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="underline underline-offset-2"
+              href="/guides/prepare-passport-photo-for-an-online-application"
+            >
+              Prepare a passport or visa photo
+            </Link>
+          </li>
+        </ul>
+      </nav>
       <section aria-labelledby="tool-guide-faq" className="mt-8">
         <h3 className="text-lg font-semibold text-slate-900" id="tool-guide-faq">Frequently asked questions</h3>
         {guide.faq.map(({ question, answer }) => (

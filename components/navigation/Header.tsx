@@ -17,6 +17,10 @@ export function Header() {
           <span className={styles.brandBadge}>Privacy-first tools</span>
         </Link>
 
+        <nav aria-label="Main navigation" className={styles.navigation}>
+          <Link href="/tools">All tools</Link>
+          <Link href="/guides">Guides</Link>
+        </nav>
         <HeaderActions />
       </div>
     </header>
