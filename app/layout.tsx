@@ -70,6 +70,7 @@ export const metadata: Metadata = {
     "contact:email": AD_CONFIG.PUBLISHER_INFO.EMAIL,
     "geo.region": "IN",
     "geo.placename": "Patna, Bihar, India",
+    "msvalidate.01": "D0C749855BC3F39FDE8F8BEE143B05B9",
   },
   category: "utilities",
 };
@@ -83,6 +84,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-IN" data-scroll-behavior="smooth">
+      <head>
+        <meta
+          name="msvalidate.01"
+          content="D0C749855BC3F39FDE8F8BEE143B05B9"
+        />
+      </head>
       <body>
         <AnalyticsConsent />
         <Header />
