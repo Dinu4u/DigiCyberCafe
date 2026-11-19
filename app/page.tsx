@@ -182,8 +182,8 @@ const searchItems: SearchItem[] = [
 ];
 
 const copy = {
-  en: { getStarted: "GET STARTED", tools: "Tools for your next thing", quickTools: "QUICK TOOLS", search: "Search tools and documents", noResults: "No matching tools yet", language: "Language" },
-  hi: { getStarted: "शुरू करें", tools: "आपके अगले काम के लिए टूल्स", quickTools: "त्वरित टूल्स", search: "टूल्स और दस्तावेज़ खोजें", noResults: "कोई मिलान नहीं मिला", language: "भाषा" },
+  en: { getStarted: "GET STARTED", tools: "Free Online Document, PDF & Photo Tools", quickTools: "QUICK TOOLS", search: "Search tools and documents", noResults: "No matching tools yet", language: "Language" },
+  hi: { getStarted: "शुरू करें", tools: "मुफ़्त ऑनलाइन दस्तावेज़, PDF और फोटो टूल्स", quickTools: "त्वरित टूल्स", search: "टूल्स और दस्तावेज़ खोजें", noResults: "कोई मिलान नहीं मिला", language: "भाषा" },
 };
 
 export default function Home() {
@@ -268,6 +268,88 @@ export default function Home() {
                   <ArrowUpRight className="card-arrow" size={18} />
                 </a>
               ))}
+            </div>
+          </section>
+          <section className="section-block home-guide" aria-labelledby="home-guide-heading">
+            <h2 id="home-guide-heading" className="mb-3 text-2xl font-medium text-slate-900">
+              Useful online tools for documents, PDFs, photos, and applications
+            </h2>
+            <p className="mb-8 max-w-4xl leading-7 text-slate-600">
+              DigiCyberCafe provides free in-browser document, PDF, and photo tools for everyday office work and online applications. Find a photo utility, prepare a PDF, create a document, or use a calculator from one place. Choose a tool above to see its supported file types, options, and instructions. The tools are designed to help with common preparation tasks; always check the requirements of the organization or website where you plan to submit a file.
+            </p>
+
+            <div className="grid gap-7 md:grid-cols-2">
+              <article>
+                <h3 className="mb-2 text-lg font-medium text-slate-900">Resize and prepare application photos</h3>
+                <p className="leading-7 text-slate-600">
+                  Photo tools can help crop a portrait, adjust its dimensions, reduce an image toward a file-size limit, or add a candidate name and date where a form asks for them. Passport and visa photo requirements are different across countries and application systems. Use the destination&apos;s current instructions for the required size, background, format, and file limit, then review the exported image at full size before uploading it. A resizer can prepare a file, but it cannot confirm that a photo meets every official rule.
+                </p>
+              </article>
+              <article>
+                <h3 className="mb-2 text-lg font-medium text-slate-900">Merge, split, compress, and sign PDFs</h3>
+                <p className="leading-7 text-slate-600">
+                  PDF utilities help organize pages, combine selected documents, extract a page range, add a watermark, or reduce file size for an upload. Some workflows also let you place a visual signature or convert supported documents into PDF pages. Check page order, legibility, and the final file size after export. A drawn or typed signature is a visual mark and does not provide a cryptographic certificate or verify the signer&apos;s identity.
+                </p>
+              </article>
+              <article>
+                <h3 className="mb-2 text-lg font-medium text-slate-900">Create everyday office documents</h3>
+                <p className="leading-7 text-slate-600">
+                  Use the invoice and quotation maker to prepare a printable business document, the rent receipt tool to create monthly records, or the email format tool to draft workplace messages. The biodata builder helps organize profile information into an exportable document. Review names, dates, amounts, tax details, and other entries carefully before sharing or relying on an export. These tools help with formatting; they do not replace professional accounting, legal, or tax advice.
+                </p>
+              </article>
+              <article>
+                <h3 className="mb-2 text-lg font-medium text-slate-900">Use calculators and image utilities</h3>
+                <p className="leading-7 text-slate-600">
+                  The age and eligibility calculator can help you compare dates with the criteria you enter, while the mutual fund calculator illustrates possible growth from chosen assumptions. Investment projections are estimates, not guaranteed returns or financial advice, and exam eligibility must be checked against the relevant official notification. Image utilities can also help join ID card sides for printing, improve a photo, remove a background, or generate a barcode or QR code for supported information.
+                </p>
+              </article>
+            </div>
+
+            <div className="mt-9">
+              <h2 className="mb-3 text-2xl font-medium text-slate-900">How to use an in-browser tool</h2>
+              <ol className="grid list-inside list-decimal gap-2 leading-7 text-slate-600 sm:grid-cols-2">
+                <li>Open the tool that matches your task and read its format and privacy notes.</li>
+                <li>Select a file or enter the details the tool requests, then choose the available settings.</li>
+                <li>Preview the result and correct any pages, dimensions, text, or values that need attention.</li>
+                <li>Export the file and verify it against the destination&apos;s rules before submitting or sharing.</li>
+              </ol>
+            </div>
+
+            <div className="mt-9">
+              <h2 className="mb-3 text-2xl font-medium text-slate-900">Privacy and file handling</h2>
+              <p className="max-w-4xl leading-7 text-slate-600">
+                Processing depends on the tool: many file operations run in your browser, while some features may contact a service or download required assets. Read the privacy note on the individual tool before selecting sensitive files; do not assume every tool uses the same processing method. Keep exported identity documents and financial records somewhere secure, and remove copies from shared devices when you are finished. For details about site data and account features, read the Privacy Policy linked in the site footer.
+              </p>
+            </div>
+
+            <div className="mt-9">
+              <h2 className="mb-3 text-2xl font-medium text-slate-900">Common questions</h2>
+              <div className="grid gap-5 md:grid-cols-2">
+                <article>
+                  <h3 className="mb-1 font-medium text-slate-900">Will every tool make my file meet an application&apos;s rules?</h3>
+                  <p className="leading-7 text-slate-600">
+                    No. Tools can help adjust or organize a file, but each application sets its own current requirements. Check those instructions and inspect the final file before submitting it.
+                  </p>
+                </article>
+                <article>
+                  <h3 className="mb-1 font-medium text-slate-900">Are files always processed only on my device?</h3>
+                  <p className="leading-7 text-slate-600">
+                    Processing varies by feature. Check the privacy details shown on the specific tool page for information about local processing, downloaded assets, or services it uses.
+                  </p>
+                </article>
+                <article>
+                  <h3 className="mb-1 font-medium text-slate-900">How do I know if a compressed file is small enough?</h3>
+                  <p className="leading-7 text-slate-600">
+                    Check the exported file&apos;s actual size and confirm that its pages or image remain readable. Compression results depend on the source file and selected settings.
+                  </p>
+                </article>
+                <article>
+                  <h3 className="mb-1 font-medium text-slate-900">Can I rely on a calculator result as an official decision?</h3>
+                  <p className="leading-7 text-slate-600">
+                    No. Calculators provide estimates based on the information and assumptions entered. Confirm eligibility with the official notice and discuss financial decisions with a qualified adviser.
+                  </p>
+                </article>
+              </div>
             </div>
           </section>
         </div>

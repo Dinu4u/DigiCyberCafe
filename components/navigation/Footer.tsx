@@ -3,8 +3,8 @@ import { AD_CONFIG } from "@/config/adPolicy";
 import { AnalyticsPreferencesButton } from "@/components/analytics/AnalyticsPreferencesButton";
 
 const primaryLinks = [
-  { href: "/tools", label: "All Tools" },
-  { href: "/guides", label: "Guides" },
+  { href: "/tools", label: "Browse all tools" },
+  { href: "/guides", label: "How-to guides" },
   { href: "/tools/sarkari-exam-age-calculator", label: "Sarkari / Exam Tools" },
   { href: "/tools/pdf", label: "PDF Utilities" },
   { href: "/privacy-policy", label: "Privacy First" },
@@ -27,7 +27,7 @@ export function Footer() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-center text-slate-700 sm:text-left">
             <Link className="font-medium text-slate-900 hover:underline" href="/">
-              DigiCyberCafe
+              DigiCyberCafe home
             </Link>
             <span className="mx-2 text-slate-400" aria-hidden="true">·</span>
             made for the details
