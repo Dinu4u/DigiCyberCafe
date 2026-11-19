@@ -7,6 +7,7 @@ import { Footer } from "@/components/navigation/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { AD_CONFIG } from "@/config/adPolicy";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/seo/site";
 import { AnalyticsConsent } from "@/components/analytics/AnalyticsConsent";
 
@@ -97,6 +98,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <Footer />
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
